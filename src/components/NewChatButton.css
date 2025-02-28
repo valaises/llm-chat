@@ -1,0 +1,22 @@
+.new-chat-button {
+  position: fixed;
+  padding: 8px 16px;
+  background-color: #303030;
+  border: 1px solid #444;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: left 0.3s ease;
+  top: 16px;
+  z-index: 99;
+  white-space: nowrap;
+  left: 266px; /* sidebar width (250px) + gap (16px) */
+}
+
+.new-chat-button.sidebar-closed {
+  left: 66px; /* collapsed sidebar width (50px) + gap (16px) */
+}
+
+.new-chat-button:hover {
+  background-color: #404040;
+}
