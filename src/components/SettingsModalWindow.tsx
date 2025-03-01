@@ -1,13 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './SettingsModalWindow.css';
 
-interface ModalWindowProps {
+interface SettingsModalWindowProps {
   isOpen: boolean;
   onClose: () => void;
-  children: React.ReactNode;
 }
 
-const SettingsModalWindow: React.FC<ModalWindowProps> = ({ isOpen, onClose, children }) => {
+const SettingsModalWindow: React.FC<SettingsModalWindowProps> = ({ isOpen, onClose }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const [activeSection, setActiveSection] = useState('general');
 
@@ -31,22 +30,23 @@ const SettingsModalWindow: React.FC<ModalWindowProps> = ({ isOpen, onClose, chil
 
   const navigationItems = [
     { id: 'general', icon: '⚙️', label: 'General' },
-    // { id: 'personalization', icon: '👤', label: 'Personalization' },
-    // { id: 'speech', icon: '🎤', label: 'Speech' },
-    // { id: 'data', icon: '📊', label: 'Data controls' },
-    // { id: 'builder', icon: '📱', label: 'Builder profile' },
-    // { id: 'apps', icon: '🔌', label: 'Connected apps' },
-    // { id: 'security', icon: '🔒', label: 'Security' },
+    { id: 'personalization', icon: '👤', label: 'Personalization' },
+    { id: 'speech', icon: '🎤', label: 'Speech' },
+    { id: 'data', icon: '📊', label: 'Data controls' },
+    { id: 'builder', icon: '📱', label: 'Builder profile' },
+    { id: 'connections', icon: '☁️', label: 'Connections' },
+    { id: 'apps', icon: '🔌', label: 'Connected apps' },
+    { id: 'security', icon: '🔒', label: 'Security' },
   ];
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content" ref={modalRef}>
-        <div className="modal-header">
-          <h2 className="modal-title">Settings</h2>
-          <button className="modal-close" onClick={onClose}>×</button>
+    <div className="settings-modal-overlay">
+      <div className="settings-modal-content" ref={modalRef}>
+        <div className="settings-modal-header">
+          <h2 className="settings-modal-title">Settings</h2>
+          <button className="settings-modal-close" onClick={onClose}>×</button>
         </div>
-        <div className="modal-body">
+        <div className="settings-modal-body">
           <nav className="settings-nav">
             {navigationItems.map(item => (
               <div
@@ -122,7 +122,28 @@ const SettingsModalWindow: React.FC<ModalWindowProps> = ({ isOpen, onClose, chil
                 </div>
               </>
             )}
-            {children}
+
+            {activeSection === 'connections' && (
+              <>
+                <h2 className="section-title">OpenAI API</h2>
+                <div className="form-group">
+                  <label>API Endpoint</label>
+                  <input 
+                    type="text" 
+                    className="input-field"
+                    placeholder="https://api.openai.com/v1"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>API Key</label>
+                  <input 
+                    type="password" 
+                    className="input-field"
+                    placeholder="sk-..."
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
