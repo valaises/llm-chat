@@ -9,6 +9,12 @@ interface SettingsModalWindowProps {
 const SettingsModalWindow: React.FC<SettingsModalWindowProps> = ({ isOpen, onClose }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const [activeSection, setActiveSection] = useState('general');
+  const [isApiKeyVisible, setIsApiKeyVisible] = useState(false);
+  const [apiKey, setApiKey] = useState('sk-1234567890abcdef'); // This is just an example value
+
+  const handleApiKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setApiKey(e.target.value);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -61,68 +67,6 @@ const SettingsModalWindow: React.FC<SettingsModalWindowProps> = ({ isOpen, onClo
           </nav>
           
           <div className="settings-content">
-            {activeSection === 'general' && (
-              <>
-                <div className="settings-section">
-                  <span>Theme</span>
-                  <div className="select-wrapper">
-                    <select>
-                      <option value="system">System</option>
-                      <option value="light">Light</option>
-                      <option value="dark">Dark</option>
-                    </select>
-                  </div>
-                </div>
-                
-                <div className="settings-section">
-                  <span>Always show code when using data analyst</span>
-                  <label className="toggle-switch">
-                    <input type="checkbox" />
-                    <span className="toggle-slider"></span>
-                  </label>
-                </div>
-
-                <div className="settings-section">
-                  <span>Show follow up suggestions in chats</span>
-                  <label className="toggle-switch">
-                    <input type="checkbox" defaultChecked />
-                    <span className="toggle-slider"></span>
-                  </label>
-                </div>
-
-                <div className="settings-section">
-                  <span>Language</span>
-                  <div className="select-wrapper">
-                    <select>
-                      <option value="auto">Auto-detect</option>
-                      <option value="en">English</option>
-                      <option value="es">Spanish</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="settings-section">
-                  <span>Archived chats</span>
-                  <button className="button">Manage</button>
-                </div>
-
-                <div className="settings-section">
-                  <span>Archive all chats</span>
-                  <button className="button">Archive all</button>
-                </div>
-
-                <div className="settings-section">
-                  <span>Delete all chats</span>
-                  <button className="button button-danger">Delete all</button>
-                </div>
-
-                <div className="settings-section">
-                  <span>Log out on this device</span>
-                  <button className="button">Log out</button>
-                </div>
-              </>
-            )}
-
             {activeSection === 'connections' && (
               <>
                 <h2 className="section-title">OpenAI API</h2>
@@ -137,8 +81,12 @@ const SettingsModalWindow: React.FC<SettingsModalWindowProps> = ({ isOpen, onClo
                 <div className="form-group">
                   <label>API Key</label>
                   <input 
-                    type="password" 
+                    type={isApiKeyVisible ? "text" : "password"}
                     className="input-field"
+                    value={apiKey}
+                    onChange={handleApiKeyChange}
+                    onFocus={() => setIsApiKeyVisible(true)}
+                    onBlur={() => setIsApiKeyVisible(false)}
                     placeholder="sk-..."
                   />
                 </div>

@@ -69,7 +69,7 @@
   width: 200px;
   flex-shrink: 0;
   padding: 8px;
-  background: rgba(255, 255, 255, 0.05);
+  /*background: rgba(255, 255, 255, 0.05);*/
   border-radius: 8px;
   margin: 16px 0 16px 16px;
 }
@@ -236,7 +236,7 @@ input:checked + .toggle-slider:before {
 }
 
 .input-field {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
   border: none;
   border-radius: 6px;
   color: #fff;
