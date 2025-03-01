@@ -97,15 +97,17 @@ export const Chat: React.FC<ChatProps> = ({ sidebarOpen, currentChat, currentCha
   return (
     <div className={`main-content ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
       <div className="chat-container">
-        <div className="chat-window" ref={chatWindowRef}>
-          {currentChat.messages.map((message) => (
-            <div
-              key={message.id}
-              className={`message ${message.isUser ? 'user-message' : 'ai-message'}`}
-            >
-              {message.text}
-            </div>
-          ))}
+        <div className="scrollable-content" ref={chatWindowRef}>
+          <div className="chat-window">
+            {currentChat.messages.map((message) => (
+              <div
+                key={message.id}
+                className={`message ${message.isUser ? 'user-message' : 'ai-message'}`}
+              >
+                {message.text}
+              </div>
+            ))}
+          </div>
         </div>
         <div className="input-container">
           <textarea
