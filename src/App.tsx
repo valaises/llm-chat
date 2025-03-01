@@ -3,6 +3,8 @@ import './App.css'
 import { ChatSidebar } from './components/ChatSidebar'
 import { NewChatButton } from './components/NewChatButton'
 import { Chat } from './components/Chat'
+import { ChatProvider, useChat } from './ChatContext' // Import the ChatProvider
+
 
 interface Message {
   id: number;
@@ -17,11 +19,18 @@ interface Chat {
 }
 
 function App() {
-  const [chats, setChats] = useState<Chat[]>([{ id: 1, name: 'New Chat', messages: [] }]);
-  const [currentChatId, setCurrentChatId] = useState<number>(1);
+  return (
+    <ChatProvider>
+      <AppContent />
+    </ChatProvider>
+  );
+}
+
+function AppContent() {
+  const ctx = useChat(); // Use the context
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  const currentChat = chats.find(chat => chat.id === currentChatId) || chats[0];
+  const currentChat = ctx.chats.find(chat => chat.id === ctx.currentChatId) || ctx.chats[0];
 
   const handleNewChat = () => {
     const newChat: Chat = {
@@ -29,8 +38,8 @@ function App() {
       name: 'New Chat',
       messages: []
     };
-    setChats(prev => [...prev, newChat]);
-    setCurrentChatId(newChat.id);
+    ctx.setChats(prev => [...prev, newChat]);
+    ctx.setCurrentChatId(newChat.id);
   };
 
   return (
@@ -38,9 +47,9 @@ function App() {
       <ChatSidebar 
         isOpen={sidebarOpen} 
         onToggle={() => setSidebarOpen(!sidebarOpen)}
-        chats={chats}
-        currentChatId={currentChatId}
-        onSelectChat={setCurrentChatId}
+        chats={ctx.chats}
+        currentChatId={ctx.currentChatId}
+        onSelectChat={ctx.setCurrentChatId}
       />
       <NewChatButton 
         onClick={handleNewChat}
@@ -49,9 +58,9 @@ function App() {
       <Chat
         sidebarOpen={sidebarOpen}
         currentChat={currentChat}
-        currentChatId={currentChatId}
-        chats={chats}
-        setChats={setChats}
+        currentChatId={ctx.currentChatId}
+        chats={ctx.chats}
+        setChats={ctx.setChats}
       />
     </div>
   )
