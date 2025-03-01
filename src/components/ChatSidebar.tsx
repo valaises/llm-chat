@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './ChatSidebar.css';
-import ModalWindow from './ModalWindow';
+import SettingsModalWindow from './SettingsModalWindow.tsx';
 
 interface Chat {
   id: number;
@@ -85,10 +85,10 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
         </div>
       </div>
 
-      <ModalWindow isOpen={isModalOpen} onClose={handleCloseModal}>
+      <SettingsModalWindow isOpen={isModalOpen} onClose={handleCloseModal}>
         <h2>Settings</h2>
         {/* Modal content will be added later */}
-      </ModalWindow>
+      </SettingsModalWindow>
     </>
   );
 };
