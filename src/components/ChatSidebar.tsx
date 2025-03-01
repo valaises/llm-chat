@@ -56,6 +56,19 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
           </div>
         </div>
 
+        <div className="sidebar-footer">
+          <button 
+            className="settings-button"
+            type="button"
+            aria-label="Settings"
+          >
+            {isOpen ? (
+              '⚙️ Settings'
+            ) : (
+              '⚙️'
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
