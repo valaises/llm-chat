@@ -21,17 +21,20 @@
 }
 
 .toggle-button-container {
-  padding: 8px;
+  /*padding: 8px;*/
   display: flex;
   justify-content: flex-end;
   border-bottom: 1px solid #333;
+  height: 3rem;
 }
 
 .toggle-button {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 0.5rem 0.5rem;
+  width: 100%;
+  height: 100%;
   color: #fff;
 }
 

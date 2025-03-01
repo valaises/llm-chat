@@ -8,12 +8,14 @@ interface NewChatButtonProps {
 
 export const NewChatButton: React.FC<NewChatButtonProps> = ({ onClick, sidebarOpen }) => {
   return (
-    <button 
-      className={`new-chat-button ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}
-      onClick={onClick}
-      type="button"
-    >
-      New Chat
-    </button>
+    <div className={`new-chat-button-container ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
+      <button
+        className="new-chat-button"
+        onClick={onClick}
+        type="button"
+      >
+        New Chat
+      </button>
+    </div>
   );
 };

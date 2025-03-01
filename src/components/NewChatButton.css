@@ -1,20 +1,25 @@
-.new-chat-button {
+.new-chat-button-container {
   position: fixed;
-  padding: 8px 16px;
-  background-color: #303030;
-  border: 1px solid #444;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
   transition: left 0.3s ease;
-  top: 16px;
+  top: 0;
   z-index: 99;
   white-space: nowrap;
   left: 266px; /* sidebar width (250px) + gap (16px) */
+  border-bottom: 1px solid #444;
+  height: 3rem;
 }
 
-.new-chat-button.sidebar-closed {
+.new-chat-button-container.sidebar-closed {
   left: 66px; /* collapsed sidebar width (50px) + gap (16px) */
+}
+
+.new-chat-button {
+  /*padding: 0.5rem 8px;*/
+  background-color: #212121;
+  color: white;
+  border-radius: 0;
+  cursor: pointer;
+  height: 100%;
 }
 
 .new-chat-button:hover {
