@@ -63,6 +63,11 @@
   transition: background-color 0.2s;
   background-color: #303030;
   color: #fff;
+  height: 1.5rem;
+}
+
+.history-item-text {
+  white-space: nowrap;
 }
 
 .history-item:hover {
@@ -74,5 +79,13 @@
 }
 
 .closed .sidebar-content {
-  display: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.sidebar-content {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }

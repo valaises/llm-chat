@@ -14,14 +14,18 @@
 }
 
 .new-chat-button {
-  /*padding: 0.5rem 8px;*/
-  background-color: #212121;
-  color: white;
+  background: none;
+  color: #fff;
   border-radius: 0;
   cursor: pointer;
   height: 100%;
 }
 
 .new-chat-button:hover {
-  background-color: #404040;
+  border-bottom-color: #4a9eff;
+  outline: none;  /* Remove outline on hover */
+}
+
+.new-chat-button:focus {
+  outline: none;  /* Also remove outline on focus for consistency */
 }

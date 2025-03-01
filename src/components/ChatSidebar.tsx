@@ -49,7 +49,7 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
                   className={`history-item ${chat.id === currentChatId ? 'active' : ''}`}
                   onClick={() => onSelectChat(chat.id)}
                 >
-                  {chat.name}
+                  <div className="history-item-text">{chat.name}</div>
                 </div>
               ))}
             </div>
