@@ -4,13 +4,13 @@
   top: 0;
   z-index: 99;
   white-space: nowrap;
-  left: 266px; /* sidebar width (250px) + gap (16px) */
+  left: calc(var(--sidebar-width) + 1rem); /* sidebar width (250px) + gap (16px) */
   border-bottom: 1px solid #444;
   height: 3rem;
 }
 
 .new-chat-button-container.sidebar-closed {
-  left: 66px; /* collapsed sidebar width (50px) + gap (16px) */
+  left: calc(var(--sidebar-closed-width) + 1rem); /* collapsed sidebar width (50px) + gap (16px) + 1rem */
 }
 
 .new-chat-button {
