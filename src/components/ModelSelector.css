@@ -1,0 +1,53 @@
+.model-selector {
+  position: fixed; /* Changed to fixed */
+  top: 0; /* Set to 0 to stick to the top */
+  right: 0.5rem; /* Keep the right offset */
+  z-index: 100; /* Ensure it appears above other elements */
+  height: 3rem; /* Keep the height */
+  border-bottom: 1px solid #444; /* Keep the border */
+}
+
+.model-selector-button {
+  background: none; /* Keep background none */
+  color: #ffffff;
+  border-radius: 0; /* Keep border radius */
+  cursor: pointer;
+  font-size: 16px; /* Keep font size */
+  height: 100%;
+  width: 100%;
+  min-width: 150px;
+  text-align: left;
+  padding: 10px; /* Keep padding */
+}
+
+.model-selector-button:hover {
+  border-bottom-color: #4a9eff; /* Keep hover effect */
+  outline: none; /* Remove outline on hover */
+}
+
+.model-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #2c2c2c;
+  border: 1px solid #404040;
+  border-radius: 6px;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.model-option {
+  padding: 8px 16px;
+  cursor: pointer;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.model-option:hover {
+  background-color: #363636;
+}
+
+.model-option.selected {
+  background-color: #404040;
+}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ModelSelector } from './ModelSelector';
 import './Chat.css';
 
 interface Message {
@@ -23,6 +24,7 @@ interface ChatProps {
 
 export const Chat: React.FC<ChatProps> = ({ sidebarOpen, currentChat, currentChatId, chats, setChats }) => {
   const [inputText, setInputText] = useState('');
+  const [selectedModel, setSelectedModel] = useState('gpt-3.5-turbo');
   const chatWindowRef = React.useRef<HTMLDivElement>(null);
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -60,7 +62,7 @@ export const Chat: React.FC<ChatProps> = ({ sidebarOpen, currentChat, currentCha
     setTimeout(() => {
       const aiMessage: Message = {
         id: Date.now() + 1,
-        text: "This is a sample response from the AI model.",
+        text: `This is a sample response from the ${selectedModel} model.`,
         isUser: false,
       };
       setChats(prev => prev.map(chat =>
@@ -96,6 +98,12 @@ export const Chat: React.FC<ChatProps> = ({ sidebarOpen, currentChat, currentCha
 
   return (
     <div className={`main-content ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
+      <div className="model-selector-container">
+        <ModelSelector
+          selectedModel={selectedModel}
+          onModelSelect={setSelectedModel}
+        />
+      </div>
       <div className="chat-container">
         <div className="scrollable-content" ref={chatWindowRef}>
           <div className="chat-window">
