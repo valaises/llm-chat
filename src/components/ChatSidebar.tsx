@@ -55,6 +55,7 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );
