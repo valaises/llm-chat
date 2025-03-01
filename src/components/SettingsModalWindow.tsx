@@ -8,7 +8,7 @@ interface SettingsModalWindowProps {
 
 const SettingsModalWindow: React.FC<SettingsModalWindowProps> = ({ isOpen, onClose }) => {
   const modalRef = useRef<HTMLDivElement>(null);
-  const [activeSection, setActiveSection] = useState('general');
+  const [activeSection, setActiveSection] = useState('connections');
   const [isApiKeyVisible, setIsApiKeyVisible] = useState(false);
   const [apiKey, setApiKey] = useState('sk-1234567890abcdef'); // This is just an example value
 
@@ -35,14 +35,14 @@ const SettingsModalWindow: React.FC<SettingsModalWindowProps> = ({ isOpen, onClo
   if (!isOpen) return null;
 
   const navigationItems = [
-    { id: 'general', icon: '⚙️', label: 'General' },
-    { id: 'personalization', icon: '👤', label: 'Personalization' },
-    { id: 'speech', icon: '🎤', label: 'Speech' },
-    { id: 'data', icon: '📊', label: 'Data controls' },
-    { id: 'builder', icon: '📱', label: 'Builder profile' },
+    // { id: 'general', icon: '⚙️', label: 'General' },
+    // { id: 'personalization', icon: '👤', label: 'Personalization' },
+    // { id: 'speech', icon: '🎤', label: 'Speech' },
+    // { id: 'data', icon: '📊', label: 'Data controls' },
+    // { id: 'builder', icon: '📱', label: 'Builder profile' },
     { id: 'connections', icon: '☁️', label: 'Connections' },
-    { id: 'apps', icon: '🔌', label: 'Connected apps' },
-    { id: 'security', icon: '🔒', label: 'Security' },
+    // { id: 'apps', icon: '🔌', label: 'Connected apps' },
+    // { id: 'security', icon: '🔒', label: 'Security' },
   ];
 
   return (
