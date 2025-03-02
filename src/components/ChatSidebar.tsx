@@ -43,7 +43,7 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({isOpen, onToggle, ctx,}
             <div className="sidebar-section">
               <h2>History</h2>
               <div className="history-list">
-                {ctx.chats.map(chat => (
+                {[...ctx.chats].reverse().map(chat => (
                   <div 
                     key={chat.id}
                     className={`history-item ${chat.id === ctx.currentChatID ? 'active' : ''}`}

@@ -3,7 +3,7 @@ import { ChatSidebar } from './components/ChatSidebar'
 import { NewChatButton } from './components/NewChatButton'
 import { ChatComponent } from './components/Chat'
 import { ChatProvider} from './ChatContext'
-import {generateRandomHash} from "./utils.ts";
+import {generateRandomHash, getCurrentChat} from "./utils.ts";
 import {Chat} from "./types.ts";
 import {useChat} from "./UseChat.ts";
 
@@ -24,6 +24,9 @@ function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const handleNewChat = () => {
+    if (getCurrentChat(ctx.chats, ctx.currentChatID)?.messages.length === 0) {
+      return;
+    }
     const newChat: Chat = {
       id: generateRandomHash(),
       name: '',
