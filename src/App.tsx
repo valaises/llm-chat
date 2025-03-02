@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { ChatSidebar } from './components/ChatSidebar'
 import { NewChatButton } from './components/NewChatButton'
 import { ChatComponent } from './components/Chat'
