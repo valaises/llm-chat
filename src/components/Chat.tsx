@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ModelSelector } from './ModelSelector';
-import {Message, Chat, ChatContextType} from '../types';
+import { Message, ChatContextType } from '../types';
 import './Chat.css';
 import { getCurrentChat } from '../utils';
 
@@ -23,7 +23,7 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
     if (chatWindowRef.current) {
       chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
     }
-  }, [currentChat.messages]);
+  }, [currentChat?.messages]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -40,12 +40,8 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
       isUser: true,
     };
 
-    const updatedChat: Chat = {
-      ...currentChat,
-      messages: [...currentChat.messages, userMessage]
-    };
-
-    ctx.updateChat(updatedChat);
+    currentChat.messages.push(userMessage);
+    ctx.updateChat(currentChat);
 
     // Add mock AI response
     setTimeout(() => {
@@ -54,12 +50,9 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
         isUser: false,
       };
 
-      const updatedChatWithAI: Chat = {
-        ...currentChat,
-        messages: [...currentChat.messages, userMessage, aiMessage]
-      };
+      currentChat.messages.push(aiMessage);
 
-      ctx.updateChat(updatedChatWithAI);
+      ctx.updateChat(currentChat);
     }, 500);
 
     setInputText('');
@@ -97,7 +90,7 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
       <div className="chat-container">
         <div className="scrollable-content" ref={chatWindowRef}>
           <div className="chat-window">
-            {currentChat.messages.map((message, index) => (
+            {currentChat?.messages.map((message, index) => (
               <div
                 key={index}
                 className={`message ${message.isUser ? 'user-message' : 'ai-message'}`}

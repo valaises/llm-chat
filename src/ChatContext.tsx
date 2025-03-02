@@ -10,6 +10,7 @@ const getChats = (): Chat[] => {
 };
 
 const appendChat = (newChat: Chat) => {
+  console.log('newChat: ', newChat);
   const chats = getChats();
   chats.push(newChat);
   localStorage.setItem('chats', JSON.stringify(chats));
@@ -114,6 +115,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       updateCurrentChatId(chats[chats.length - 1].id);
     }
   }, [chats, currentChatID]);
+
+  console.log('ChatContext init: currentChatID: ', currentChatID);
 
   return (
     <ChatContext.Provider value={{

@@ -20,6 +20,7 @@ function App() {
 
 function AppContent() {
   const ctx = useChat(); // Use the context
+  console.log("AppContent: ctx is invoked!", ctx);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const handleNewChat = () => {
@@ -30,6 +31,7 @@ function AppContent() {
     };
     ctx.setChats(newChat);
     ctx.setCurrentChatID(newChat.id);
+    console.log("handleNewChat: new chat is created", newChat);
   };
 
   return (
