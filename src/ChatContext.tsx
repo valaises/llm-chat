@@ -1,26 +1,8 @@
-import React, {createContext, useContext, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {generateRandomHash} from "./utils.ts";
 import {Chat} from "./types.ts";
+import { ChatContext } from './UseChat.ts';
 
-
-export interface ChatContextType {
-  chats: Chat[];
-  setChats: (newChat: Chat) => void;
-
-  currentChatID: string;
-  setCurrentChatID: (newChatId: string) => void;
-
-  last_used_model: string | undefined;
-  setlastUsedModelID: (newModel: string) => void;
-  
-  endpointURL: string | undefined;
-  setEndpointURL: (newURL: string) => void;
-  
-  endpointAPIKey: string | undefined;
-  setEndpointAPIKey: (newKey: string) => void;
-  
-  // Add other properties as needed
-}
 
 const getChats = (): Chat[] => {
   const savedChats = localStorage.getItem('chats');
@@ -74,8 +56,6 @@ const setEndpointAPIKey = (key: string) => {
 };
 
 
-const ChatContext = createContext<ChatContextType | undefined>(undefined);
-
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [chats, _setChats] = useState<Chat[]>(() => {
     return getChats().length > 0 ? getChats() : [{ id: generateRandomHash(), name: '', messages: [] }];
@@ -94,6 +74,18 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const updatedChats = [...prevChats, newChat];
       appendChat(newChat);
       return updatedChats;
+    });
+  };
+
+  const updateChat = (updChat: Chat) => {
+    _setChats(chats => {
+      const chatIndex = chats.findIndex(chat => chat.id === updChat.id);
+      if (chatIndex !== -1) {
+        const updatedChats = [...chats];
+        updatedChats[chatIndex] = updChat; // Update the chat at the found index
+        return updatedChats; // Return the updated chats array
+      }
+      return chats; // Return the original chats if no update was made
     });
   };
 
@@ -127,6 +119,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <ChatContext.Provider value={{
       chats: chats,
       setChats: updateChats,
+      updateChat: updateChat,
 
       currentChatID: currentChatID,
       setCurrentChatID: updateCurrentChatId,
@@ -144,12 +137,4 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       {children}
     </ChatContext.Provider>
   );
-};
-
-export const useChat = () => {
-  const context = useContext(ChatContext);
-  if (!context) {
-    throw new Error('useChat must be used within a ChatProvider');
-  }
-  return context;
 };

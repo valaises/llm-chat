@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { ChatSidebar } from './components/ChatSidebar'
 import { NewChatButton } from './components/NewChatButton'
 import { ChatComponent } from './components/Chat'
-import { ChatProvider, useChat } from './ChatContext'
+import { ChatProvider} from './ChatContext'
 import {generateRandomHash} from "./utils.ts";
 import {Chat} from "./types.ts";
+import {useChat} from "./UseChat.ts";
 
 import './App.css'
 

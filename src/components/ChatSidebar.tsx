@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './ChatSidebar.css';
 import SettingsModalWindow from './SettingsModalWindow.tsx';
-import {ChatContextType} from "../ChatContext.tsx";
+import {ChatContextType} from "../types.ts";
 
 
 interface ChatSidebarProps {

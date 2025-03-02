@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ModelSelector } from './ModelSelector';
-import { Message } from '../types';
+import {Message, Chat, ChatContextType} from '../types';
 import './Chat.css';
-import {ChatContextType} from "../ChatContext.tsx";
+import { getCurrentChat } from '../utils';
 
 
 interface ChatProps {
@@ -15,6 +15,8 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
   const [selectedModel, setSelectedModel] = useState('gpt-3.5-turbo');
   const chatWindowRef = React.useRef<HTMLDivElement>(null);
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+
+  const currentChat = getCurrentChat(ctx.chats, ctx.currentChatID)!;
 
   // Auto-scroll to bottom when new messages appear
   useEffect(() => {
@@ -38,11 +40,12 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
       isUser: true,
     };
 
-    setChats(prev => prev.map(chat =>
-      chat.id === currentChatId
-        ? { ...chat, messages: [...chat.messages, userMessage] }
-        : chat
-    ));
+    const updatedChat: Chat = {
+      ...currentChat,
+      messages: [...currentChat.messages, userMessage]
+    };
+
+    ctx.updateChat(updatedChat);
 
     // Add mock AI response
     setTimeout(() => {
@@ -50,11 +53,13 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
         text: `This is a sample response from the ${selectedModel} model.`,
         isUser: false,
       };
-      setChats(prev => prev.map(chat =>
-        chat.id === currentChatId
-          ? { ...chat, messages: [...chat.messages, aiMessage] }
-          : chat
-      ));
+
+      const updatedChatWithAI: Chat = {
+        ...currentChat,
+        messages: [...currentChat.messages, userMessage, aiMessage]
+      };
+
+      ctx.updateChat(updatedChatWithAI);
     }, 500);
 
     setInputText('');
@@ -92,9 +97,9 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
       <div className="chat-container">
         <div className="scrollable-content" ref={chatWindowRef}>
           <div className="chat-window">
-            {currentChat.messages.map((message) => (
+            {currentChat.messages.map((message, index) => (
               <div
-                key={message.id}
+                key={index}
                 className={`message ${message.isUser ? 'user-message' : 'ai-message'}`}
               >
                 {message.text}
