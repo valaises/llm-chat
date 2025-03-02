@@ -1,20 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './SettingsModalWindow.css';
+import {ChatContextType} from "../types.ts";
 
 interface SettingsModalWindowProps {
   isOpen: boolean;
   onClose: () => void;
+  ctx: ChatContextType;
 }
 
-const SettingsModalWindow: React.FC<SettingsModalWindowProps> = ({ isOpen, onClose }) => {
+const SettingsModalWindow: React.FC<SettingsModalWindowProps> = ({ isOpen, onClose, ctx }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const [activeSection, setActiveSection] = useState('connections');
   const [isApiKeyVisible, setIsApiKeyVisible] = useState(false);
-  const [apiKey, setApiKey] = useState('sk-1234567890abcdef'); // This is just an example value
-
-  const handleApiKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setApiKey(e.target.value);
-  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -75,6 +72,8 @@ const SettingsModalWindow: React.FC<SettingsModalWindowProps> = ({ isOpen, onClo
                   <input 
                     type="text" 
                     className="input-field"
+                    value={ctx.endpointURL}
+                    onChange={(e) => ctx.setEndpointURL(e.target.value)}
                     placeholder="https://api.openai.com/v1"
                   />
                 </div>
@@ -83,8 +82,8 @@ const SettingsModalWindow: React.FC<SettingsModalWindowProps> = ({ isOpen, onClo
                   <input 
                     type={isApiKeyVisible ? "text" : "password"}
                     className="input-field"
-                    value={apiKey}
-                    onChange={handleApiKeyChange}
+                    value={ctx.endpointAPIKey}
+                    onChange={(e) => ctx.setEndpointAPIKey(e.target.value)}
                     onFocus={() => setIsApiKeyVisible(true)}
                     onBlur={() => setIsApiKeyVisible(false)}
                     placeholder="sk-..."

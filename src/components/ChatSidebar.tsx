@@ -73,7 +73,7 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({isOpen, onToggle, ctx,}
         </div>
       </div>
 
-      <SettingsModalWindow isOpen={isModalOpen} onClose={handleCloseModal}>
+      <SettingsModalWindow isOpen={isModalOpen} onClose={handleCloseModal} ctx={ctx}>
         <h2>Settings</h2>
         {/* Modal content will be added later */}
       </SettingsModalWindow>

@@ -38,18 +38,18 @@ const setlastUsedModelID = (model: string) => {
   localStorage.setItem('lastUsedModelID', model);
 }
 
-const getEndpointURL = (): string | undefined => {
+const getEndpointURL = (): string => {
   const endpointURL = localStorage.getItem('endpointURL');
-  return endpointURL || undefined;
+  return endpointURL || '';
 };
 
 const setEndpointURL = (url: string) => {
   localStorage.setItem('endpointURL', url);
 }
 
-const getEndpointAPIKey = (): string | undefined => {
+const getEndpointAPIKey = (): string => {
   const EndpointAPIKey = localStorage.getItem('EndpointAPIKey');
-  return EndpointAPIKey || undefined;
+  return EndpointAPIKey || '';
 };
 
 const setEndpointAPIKey = (key: string) => {
