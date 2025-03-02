@@ -1,28 +1,16 @@
 import React, { useState } from 'react';
 import './ChatSidebar.css';
 import SettingsModalWindow from './SettingsModalWindow.tsx';
+import {ChatContextType} from "../ChatContext.tsx";
 
-interface Chat {
-  id: number;
-  name: string;
-  messages: Array<{ id: number; text: string; isUser: boolean; }>;
-}
 
 interface ChatSidebarProps {
   isOpen: boolean;
   onToggle: () => void;
-  chats: Chat[];
-  currentChatId: number;
-  onSelectChat: (id: number) => void;
+  ctx: ChatContextType;
 }
 
-export const ChatSidebar: React.FC<ChatSidebarProps> = ({ 
-  isOpen, 
-  onToggle,
-  chats,
-  currentChatId,
-  onSelectChat
-}) => {
+export const ChatSidebar: React.FC<ChatSidebarProps> = ({isOpen, onToggle, ctx,}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleOpenModal = () => {
@@ -55,13 +43,13 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
             <div className="sidebar-section">
               <h2>History</h2>
               <div className="history-list">
-                {chats.map(chat => (
+                {ctx.chats.map(chat => (
                   <div 
                     key={chat.id}
-                    className={`history-item ${chat.id === currentChatId ? 'active' : ''}`}
-                    onClick={() => onSelectChat(chat.id)}
+                    className={`history-item ${chat.id === ctx.currentChatID ? 'active' : ''}`}
+                    onClick={() => ctx.setCurrentChatID(chat.id)}
                   >
-                    <div className="history-item-text">{chat.name}</div>
+                    <div className="history-item-text">{chat.name || "New Chat"}</div>
                   </div>
                 ))}
               </div>

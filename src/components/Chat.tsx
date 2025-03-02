@@ -1,28 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { ModelSelector } from './ModelSelector';
+import { Message } from '../types';
 import './Chat.css';
+import {ChatContextType} from "../ChatContext.tsx";
 
-interface Message {
-  id: number;
-  text: string;
-  isUser: boolean;
-}
-
-interface Chat {
-  id: number;
-  name: string;
-  messages: Message[];
-}
 
 interface ChatProps {
   sidebarOpen: boolean;
-  currentChat: Chat;
-  currentChatId: number;
-  chats: Chat[];
-  setChats: React.Dispatch<React.SetStateAction<Chat[]>>;
+  ctx: ChatContextType;
 }
 
-export const Chat: React.FC<ChatProps> = ({ sidebarOpen, currentChat, currentChatId, chats, setChats }) => {
+export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
   const [inputText, setInputText] = useState('');
   const [selectedModel, setSelectedModel] = useState('gpt-3.5-turbo');
   const chatWindowRef = React.useRef<HTMLDivElement>(null);
@@ -45,9 +33,7 @@ export const Chat: React.FC<ChatProps> = ({ sidebarOpen, currentChat, currentCha
   const handleSend = () => {
     if (inputText.trim() === '') return;
 
-    // Add user message
     const userMessage: Message = {
-      id: Date.now(),
       text: inputText,
       isUser: true,
     };
@@ -61,7 +47,6 @@ export const Chat: React.FC<ChatProps> = ({ sidebarOpen, currentChat, currentCha
     // Add mock AI response
     setTimeout(() => {
       const aiMessage: Message = {
-        id: Date.now() + 1,
         text: `This is a sample response from the ${selectedModel} model.`,
         isUser: false,
       };
