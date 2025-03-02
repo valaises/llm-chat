@@ -10,14 +10,19 @@ const getChats = (): Chat[] => {
 };
 
 const appendChat = (newChat: Chat) => {
-  console.log('newChat: ', newChat);
+  if (newChat.messages.length === 0) {
+    return;
+  }
   const chats = getChats();
   chats.push(newChat);
   localStorage.setItem('chats', JSON.stringify(chats));
 };
 
 const setChats = (newChats: Chat[]) => {
-  localStorage.setItem('chats', JSON.stringify(newChats));
+  localStorage.setItem(
+    'chats',
+    JSON.stringify(newChats.filter((c) => c.messages.length !== 0))
+  );
 };
 
 const getCurrentChatID = (): string | undefined => {
