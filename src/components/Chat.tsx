@@ -18,6 +18,7 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
   const currentChat = getCurrentChat(ctx.chats, ctx.currentChatID)!;
 
   // Auto-scroll to bottom when new messages appear
+  // todo: broken
   useEffect(() => {
     if (chatWindowRef.current) {
       chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;

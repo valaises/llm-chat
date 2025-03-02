@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {generateRandomHash} from "./utils.ts";
 import {Chat} from "./types.ts";
-import { ChatContext } from './UseChat.ts';
+import {ChatContext} from './UseChat.ts';
 
 
 const getChats = (): Chat[] => {
@@ -61,6 +61,14 @@ const setEndpointAPIKey = (key: string) => {
   localStorage.setItem('EndpointAPIKey', key);
 };
 
+const getSidebarOpen = (): boolean => {
+  return JSON.parse(localStorage.getItem('sidebarOpen') || 'true');
+}
+
+const setSidebarOpen = (isOpen: boolean): void => {
+  localStorage.setItem('sidebarOpen', JSON.stringify(isOpen));
+}
+
 
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [chats, _setChats] = useState<Chat[]>(() => {
@@ -69,7 +77,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [currentChatID, _setCurrentChatID] = useState<string>(getCurrentChatID() || generateRandomHash());
   const [lastUsedModelID, _setlastUsedModelID] = useState<string | undefined>(getLastUsedModelID());
   const [endpointURL, _setEndpointURL] = useState<string | undefined>(getEndpointURL());
-  const [endpointAPIKey, _setEndpointAPIKey] = useState<string | undefined>(getEndpointAPIKey());  
+  const [endpointAPIKey, _setEndpointAPIKey] = useState<string | undefined>(getEndpointAPIKey());
+  const [sidebarOpen, _setSidebarOpen] = useState<boolean>(getSidebarOpen());
 
   useEffect(() => {
     setChats(chats);
@@ -115,6 +124,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setEndpointAPIKey(newKey);    
   }
 
+  const updateSidebarOpen = (newValue: boolean) => {
+    _setSidebarOpen(newValue);
+    setSidebarOpen(newValue);
+  }
+
   useEffect(() => {
     if (!chats.some(chat => chat.id === currentChatID) && chats.length > 0) {
       updateCurrentChatId(chats[chats.length - 1].id);
@@ -140,6 +154,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       endpointAPIKey: endpointAPIKey,
       setEndpointAPIKey: updateEndpointAPIKey,
+
+      sidebarOpen: sidebarOpen,
+      setSidebarOpen: updateSidebarOpen,
 
     }}>
       {children}

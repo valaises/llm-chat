@@ -16,6 +16,9 @@ export interface ChatContextType {
   endpointAPIKey: string | undefined;
   setEndpointAPIKey: (newKey: string) => void;
 
+  sidebarOpen: boolean,
+  setSidebarOpen: (newState: boolean) => void;
+
   // Add other properties as needed
 }
 

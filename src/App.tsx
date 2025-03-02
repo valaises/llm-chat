@@ -20,7 +20,6 @@ function App() {
 
 function AppContent() {
   const ctx = useChat(); // Use the context
-  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const handleNewChat = () => {
     if (getCurrentChat(ctx.chats, ctx.currentChatID)?.messages.length === 0) {
@@ -36,18 +35,18 @@ function AppContent() {
   };
 
   return (
-    <div className={`app-container ${sidebarOpen ? '' : 'sidebar-closed'}`}>
+    <div className={`app-container ${ctx.sidebarOpen ? '' : 'sidebar-closed'}`}>
       <ChatSidebar 
-        isOpen={sidebarOpen} 
-        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        isOpen={ctx.sidebarOpen}
+        onToggle={() => ctx.setSidebarOpen(!ctx.sidebarOpen)}
         ctx={ctx}
       />
       <NewChatButton 
         onClick={handleNewChat}
-        sidebarOpen={sidebarOpen}
+        sidebarOpen={ctx.sidebarOpen}
       />
       <ChatComponent
-        sidebarOpen={sidebarOpen}
+        sidebarOpen={ctx.sidebarOpen}
         ctx={ctx}
       />
     </div>
