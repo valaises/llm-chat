@@ -7,7 +7,7 @@ export interface ChatContextType {
   currentChatID: string;
   setCurrentChatID: (newChatId: string) => void;
 
-  last_used_model: string | undefined;
+  lastUsedModelID: string | undefined;
   setlastUsedModelID: (newModel: string) => void;
 
   endpointURL: string | undefined;

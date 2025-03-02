@@ -12,7 +12,6 @@ interface ChatProps {
 
 export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
   const [inputText, setInputText] = useState('');
-  const [selectedModel, setSelectedModel] = useState('gpt-3.5-turbo');
   const chatWindowRef = React.useRef<HTMLDivElement>(null);
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
@@ -46,7 +45,7 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
     // Add mock AI response
     setTimeout(() => {
       const aiMessage: Message = {
-        text: `This is a sample response from the ${selectedModel} model.`,
+        text: `This is a sample response from the ${ctx.lastUsedModelID || ""} model.`,
         isUser: false,
       };
 
@@ -83,8 +82,8 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
     <div className={`main-content ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
       <div className="model-selector-container">
         <ModelSelector
-          selectedModel={selectedModel}
-          onModelSelect={setSelectedModel}
+          selectedModel={ctx.lastUsedModelID || ""}
+          onModelSelect={ctx.setlastUsedModelID}
         />
       </div>
       <div className="chat-container">

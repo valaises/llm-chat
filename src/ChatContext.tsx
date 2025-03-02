@@ -127,7 +127,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       currentChatID: currentChatID,
       setCurrentChatID: updateCurrentChatId,
 
-      last_used_model: lastUsedModelID,
+      lastUsedModelID: lastUsedModelID,
       setlastUsedModelID: updateLastUsedModelID,
       
       endpointURL: endpointURL,
