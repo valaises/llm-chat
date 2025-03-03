@@ -16,7 +16,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onM
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const models: Model[] = [
-    { id: 'gpt-4', name: 'GPT-4' },
+    { id: 'gpt-4o', name: 'GPT-4o' },
     { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo' }
   ];
 

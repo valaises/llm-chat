@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ModelSelector } from './ModelSelector';
-import { Message, ChatContextType } from '../types';
+import { Message, ChatContextType, CompletionRequest } from '../types';
 import './Chat.css';
 import { getCurrentChat } from '../utils';
-
+import { CompletionsHandler } from '../completions';
 
 interface ChatProps {
   sidebarOpen: boolean;
@@ -12,11 +12,16 @@ interface ChatProps {
 
 export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
   const [inputText, setInputText] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const chatWindowRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const observerRef = useRef<MutationObserver | null>(null);
 
   const currentChat = getCurrentChat(ctx.chats, ctx.currentChatID)!;
+  const completionsHandler = new CompletionsHandler(
+    ctx.endpointURL || "",
+    ctx.endpointAPIKey || "",
+  );
 
   const scrollToBottom = useCallback(() => {
     if (chatWindowRef.current) {
@@ -51,30 +56,61 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
     }
   };
 
-  const handleSend = () => {
-    if (inputText.trim() === '') return;
+  const handleSend = async () => {
+    if (inputText.trim() === '' || isLoading) return;
 
     const userMessage: Message = {
-      text: inputText,
-      isUser: true,
+      role: "user",
+      content: inputText,
     };
 
     currentChat.messages.push(userMessage);
     ctx.updateChat(currentChat);
+    setInputText('');
+    setIsLoading(true);
 
-    // Add mock AI response
-    setTimeout(() => {
-      const aiMessage: Message = {
-        text: `This is a sample response from the ${ctx.lastUsedModelID || ""} model.`,
-        isUser: false,
+    try {
+      const completionRequest: CompletionRequest = {
+        model: ctx.lastUsedModelID || "",
+        messages: currentChat.messages,
+        max_tokens: 150,
+        stream: true,
       };
 
-      currentChat.messages.push(aiMessage);
+      const stream = await completionsHandler.handleCompletion(completionRequest);
 
+      if (stream && Symbol.asyncIterator in stream) {
+        const message: Message = {
+          role: 'assistant',
+          content: '',
+        };
+        currentChat.messages.push(message);
+
+        for await (const chunk of stream) {
+          if (chunk.choices && chunk.choices.length > 0) {
+            const delta = chunk.choices[0].delta;
+            if (delta.content) {
+              message.content += delta.content;
+              currentChat.messages[currentChat.messages.length - 1] = { ...message };
+              ctx.updateChat(currentChat);
+            }
+          }
+        }
+      } else {
+        throw new Error('Expected a stream, but received a non-stream response');
+      }
+    } catch (error) {
+      console.error('Error in API call:', error);
+      const errorMessage: Message = {
+        role: "assistant",
+        content: `Sorry, there was an error processing your request: ${error}`,
+      };
+      currentChat.messages.push(errorMessage);
       ctx.updateChat(currentChat);
-    }, 500);
+    } finally {
+      setIsLoading(false);
+    }
 
-    setInputText('');
     // Reset textarea height after sending
     if (textareaRef.current) {
       textareaRef.current.style.height = '56px';
@@ -112,11 +148,16 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
             {currentChat?.messages.map((message, index) => (
               <div
                 key={index}
-                className={`message ${message.isUser ? 'user-message' : 'ai-message'}`}
+                className={`message ${message.role === "user" ? 'user-message' : 'ai-message'}`}
               >
-                {message.text}
+                {message.content}
               </div>
             ))}
+            {isLoading && (
+              <div className="message ai-message">
+                <span className="loading-indicator">AI is typing...</span>
+              </div>
+            )}
           </div>
         </div>
         <div className="input-container">
@@ -127,6 +168,7 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
             onKeyPress={handleKeyPress}
             placeholder="Type your message and press Enter to send..."
             rows={1}
+            disabled={isLoading}
           />
         </div>
       </div>
