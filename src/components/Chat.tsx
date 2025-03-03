@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ModelSelector } from './ModelSelector';
 import { Message, ChatContextType } from '../types';
 import './Chat.css';
@@ -12,18 +12,37 @@ interface ChatProps {
 
 export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
   const [inputText, setInputText] = useState('');
-  const chatWindowRef = React.useRef<HTMLDivElement>(null);
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+  const chatWindowRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const observerRef = useRef<MutationObserver | null>(null);
 
   const currentChat = getCurrentChat(ctx.chats, ctx.currentChatID)!;
 
-  // Auto-scroll to bottom when new messages appear
-  // todo: broken
-  useEffect(() => {
+  const scrollToBottom = useCallback(() => {
     if (chatWindowRef.current) {
       chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
     }
-  }, [currentChat?.messages]);
+  }, []);
+
+  useEffect(() => {
+    if (chatWindowRef.current) {
+      observerRef.current = new MutationObserver(scrollToBottom);
+      observerRef.current.observe(chatWindowRef.current, {
+        childList: true,
+        subtree: true,
+      });
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [scrollToBottom]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [currentChat?.messages, scrollToBottom]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
