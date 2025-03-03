@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { ChatSidebar } from './components/ChatSidebar'
 import { NewChatButton } from './components/NewChatButton'
 import { ChatComponent } from './components/Chat'
 import { ChatProvider } from './ChatContext'
 import { generateRandomHash, getCurrentChat } from "./utils.ts";
-import { Chat, CompletionModel } from "./types.ts";
+import { Chat } from "./types.ts";
 import { useChat } from "./UseChat.ts";
 import { ModelsHandler } from './models'
 

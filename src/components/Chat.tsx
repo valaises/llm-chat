@@ -12,7 +12,7 @@ interface ChatProps {
 
 export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
   const [inputText, setInputText] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const chatWindowRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const observerRef = useRef<MutationObserver | null>(null);
@@ -57,7 +57,7 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
   };
 
   const handleSend = async () => {
-    if (inputText.trim() === '' || isLoading) return;
+    if (inputText.trim() === '' || isStreaming) return;
 
     const userMessage: Message = {
       role: "user",
@@ -67,7 +67,13 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
     currentChat.messages.push(userMessage);
     ctx.updateChat(currentChat);
     setInputText('');
-    setIsLoading(true);
+    setIsStreaming(true);
+
+    const message: Message = {
+      role: 'assistant',
+      content: '',
+    };
+    currentChat.messages.push(message);
 
     try {
       const completionRequest: CompletionRequest = {
@@ -80,11 +86,6 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
       const stream = await completionsHandler.handleCompletion(completionRequest);
 
       if (stream && Symbol.asyncIterator in stream) {
-        const message: Message = {
-          role: 'assistant',
-          content: '',
-        };
-        currentChat.messages.push(message);
 
         for await (const chunk of stream) {
           if (chunk.choices && chunk.choices.length > 0) {
@@ -101,6 +102,7 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
       }
     } catch (error) {
       console.error('Error in API call:', error);
+      currentChat.messages.pop();
       const errorMessage: Message = {
         role: "assistant",
         content: `Sorry, there was an error processing your request: ${error}`,
@@ -108,7 +110,7 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
       currentChat.messages.push(errorMessage);
       ctx.updateChat(currentChat);
     } finally {
-      setIsLoading(false);
+      setIsStreaming(false);
     }
 
     // Reset textarea height after sending
@@ -151,13 +153,11 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
                 className={`message ${message.role === "user" ? 'user-message' : 'ai-message'}`}
               >
                 {message.content}
+                {isStreaming && message.role === 'assistant' && (
+                  <span className="pulsing-circle"></span>
+                )}
               </div>
             ))}
-            {isLoading && (
-              <div className="message ai-message">
-                <span className="loading-indicator">AI is typing...</span>
-              </div>
-            )}
           </div>
         </div>
         <div className="input-container">
@@ -168,7 +168,7 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
             onKeyPress={handleKeyPress}
             placeholder="Type your message and press Enter to send..."
             rows={1}
-            disabled={isLoading}
+            disabled={isStreaming}
           />
         </div>
       </div>
