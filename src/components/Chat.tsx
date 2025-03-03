@@ -16,6 +16,7 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
   const chatWindowRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const observerRef = useRef<MutationObserver | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const currentChat = getCurrentChat(ctx.chats, ctx.currentChatID)!;
   const completionsHandler = new CompletionsHandler(
@@ -56,6 +57,14 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
     }
   };
 
+  const handleStop = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setIsStreaming(false);
+    }
+  };
+
   const handleSend = async () => {
     if (inputText.trim() === '' || isStreaming) return;
 
@@ -79,15 +88,20 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
       const completionRequest: CompletionRequest = {
         model: ctx.lastUsedModelID || "",
         messages: currentChat.messages,
-        max_tokens: 150,
+        max_tokens: 256,
         stream: true,
       };
 
+      abortControllerRef.current = new AbortController();
       const stream = await completionsHandler.handleCompletion(completionRequest);
 
       if (stream && Symbol.asyncIterator in stream) {
 
         for await (const chunk of stream) {
+          // todo: doesn't work
+          if (abortControllerRef.current && abortControllerRef.current.signal.aborted) {
+            break;
+          }
           if (chunk.choices && chunk.choices.length > 0) {
             const delta = chunk.choices[0].delta;
             if (delta.content) {
@@ -111,6 +125,7 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
       ctx.updateChat(currentChat);
     } finally {
       setIsStreaming(false);
+      abortControllerRef.current = null;
     }
 
     // Reset textarea height after sending
@@ -160,18 +175,25 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
             ))}
           </div>
         </div>
-        <div className="input-container">
-          <textarea
-            ref={textareaRef}
-            value={inputText}
-            onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
-            placeholder="Type your message and press Enter to send..."
-            rows={1}
-            disabled={isStreaming}
-          />
+          <div className="input-container">
+            <div className="textarea-wrapper">
+              <textarea
+                ref={textareaRef}
+                value={inputText}
+                onChange={handleInputChange}
+                onKeyPress={handleKeyPress}
+                placeholder="Type your message and press Enter to send..."
+                rows={1}
+                disabled={isStreaming}
+              />
+              <button
+                onClick={isStreaming ? handleStop : handleSend}
+                // disabled={isStreaming || inputText.trim() === ''}
+                className="send-button"
+              >{isStreaming ? 'Stop' : 'Send'}</button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  );
+      );
 };

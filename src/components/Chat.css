@@ -4,6 +4,7 @@
   right: 16px;
   z-index: 100;
 }
+
 .scrollable-content {
   flex: 1;
   overflow-y: auto;
@@ -17,6 +18,31 @@
   /*width: 70%;*/
   margin-left: 15%;
   margin-right: calc(15% + var(--sidebar-closed-width));
+}
+
+.textarea-wrapper {
+  width: 100%;
+  position: relative;
+}
+
+.send-button {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  align-items: center;
+
+}
+
+textarea:focus {
+  border-color: #4a9eff;
+}
+
+textarea::placeholder {
+  color: #666;
 }
 
 .main-content {
