@@ -153,7 +153,7 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
                 className={`message ${message.role === "user" ? 'user-message' : 'ai-message'}`}
               >
                 {message.content}
-                {isStreaming && message.role === 'assistant' && (
+                {isStreaming && index === currentChat.messages.length - 1 && message.role === 'assistant' && (
                   <span className="pulsing-circle"></span>
                 )}
               </div>
