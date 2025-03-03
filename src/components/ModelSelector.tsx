@@ -1,10 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useChat } from '../UseChat';
 import './ModelSelector.css';
-
-interface Model {
-  id: string;
-  name: string;
-}
 
 interface ModelSelectorProps {
   selectedModel: string;
@@ -14,11 +10,7 @@ interface ModelSelectorProps {
 export const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onModelSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const models: Model[] = [
-    { id: 'gpt-4o', name: 'GPT-4o' },
-    { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo' }
-  ];
+  const ctx = useChat();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -36,7 +28,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onM
     setIsOpen(false);
   };
 
-  const currentModel = models.find(model => model.id === selectedModel)?.name || 'Select Model';
+  const currentModel = ctx.models.find(model => model.id === selectedModel)?.id || 'Select Model';
 
   return (
     <div className="model-selector" ref={dropdownRef}>
@@ -45,13 +37,13 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onM
       </button>
       {isOpen && (
         <div className="model-dropdown">
-          {models.map(model => (
+          {ctx.models.map(model => (
             <div
               key={model.id}
               className={`model-option ${selectedModel === model.id ? 'selected' : ''}`}
               onClick={() => handleModelSelect(model.id)}
             >
-              {model.name}
+              {model.id}
             </div>
           ))}
         </div>

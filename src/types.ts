@@ -18,6 +18,9 @@ export interface ChatContextType {
 
   sidebarOpen: boolean,
   setSidebarOpen: (newState: boolean) => void;
+
+  models: CompletionModel[];
+  setModels: (newModels: CompletionModel[]) => void;
 }
 
 export interface Message {
@@ -72,3 +75,16 @@ export interface CompletionResponseChunk {
     finish_reason: string | null;
   }[];
 }
+
+export interface CompletionModel {
+  id: string;
+  object: string;
+  created: number;
+  owned_by: string;
+}
+
+export interface ModelListResponse {
+  object: string;
+  data: CompletionModel[];
+}
+

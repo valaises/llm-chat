@@ -1,13 +1,14 @@
+import React, { useEffect } from 'react'
 import { ChatSidebar } from './components/ChatSidebar'
 import { NewChatButton } from './components/NewChatButton'
 import { ChatComponent } from './components/Chat'
-import { ChatProvider} from './ChatContext'
-import {generateRandomHash, getCurrentChat} from "./utils.ts";
-import {Chat} from "./types.ts";
-import {useChat} from "./UseChat.ts";
+import { ChatProvider } from './ChatContext'
+import { generateRandomHash, getCurrentChat } from "./utils.ts";
+import { Chat, CompletionModel } from "./types.ts";
+import { useChat } from "./UseChat.ts";
+import { ModelsHandler } from './models'
 
 import './App.css'
-
 
 function App() {
   return (
@@ -33,6 +34,27 @@ function AppContent() {
     ctx.setCurrentChatID(newChat.id);
   };
 
+  const fetchModels = async () => {
+    if (ctx.endpointURL && ctx.endpointAPIKey) {
+      const modelsHandler = new ModelsHandler(ctx.endpointURL, ctx.endpointAPIKey);
+      try {
+        const models = await modelsHandler.listModels();
+        ctx.setModels(models);
+      } catch (error) {
+        console.error('Failed to fetch models:', error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchModels();
+
+    const intervalId = setInterval(fetchModels, 30000);
+
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(intervalId);
+  }, [ctx.endpointURL, ctx.endpointAPIKey]);
+
   return (
     <div className={`app-container ${ctx.sidebarOpen ? '' : 'sidebar-closed'}`}>
       <ChatSidebar 
@@ -52,4 +74,4 @@ function AppContent() {
   )
 }
 
-export default App
+export default App;

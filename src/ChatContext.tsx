@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {generateRandomHash} from "./utils.ts";
-import {Chat} from "./types.ts";
+import {Chat, CompletionModel} from "./types.ts";
 import {ChatContext} from './UseChat.ts';
 
 
@@ -79,6 +79,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [endpointURL, _setEndpointURL] = useState<string | undefined>(getEndpointURL());
   const [endpointAPIKey, _setEndpointAPIKey] = useState<string | undefined>(getEndpointAPIKey());
   const [sidebarOpen, _setSidebarOpen] = useState<boolean>(getSidebarOpen());
+  const [models, _setModels] = useState<CompletionModel[]>([]);
 
   useEffect(() => {
     setChats(chats);
@@ -129,6 +130,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSidebarOpen(newValue);
   }
 
+  const updateModels = (newModels: CompletionModel[]) => {
+    _setModels(newModels);
+  }
+
   useEffect(() => {
     if (!chats.some(chat => chat.id === currentChatID) && chats.length > 0) {
       updateCurrentChatId(chats[chats.length - 1].id);
@@ -158,6 +163,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       sidebarOpen: sidebarOpen,
       setSidebarOpen: updateSidebarOpen,
 
+      models: models,
+      setModels: updateModels,
     }}>
       {children}
     </ChatContext.Provider>
