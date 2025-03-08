@@ -77,32 +77,16 @@ const CopyButton: React.FC<CopyButtonProps> = ({ text }) => {
 interface CodeBlockProps {
   children: React.ReactNode;
   language?: string;
+  text: string;
 }
 
-const CodeBlock: React.FC<CodeBlockProps> = ({children}) => {
+const CodeBlock: React.FC<CodeBlockProps> = (props) => {
   // Convert children to string if it's a plain text node
-  const getCodeText = (children: React.ReactNode): string => {
-    if (typeof children === 'string') {
-      // Remove language identifier if it's at the start of the string
-      return children.replace(/^(python|rust|typescript|javascript|java|cpp|cs|go|php|html|css|sql|json|yaml|xml|bash|sh|text)\b/, '').trim();
-    }
-    if (React.isValidElement(children)) {
-      if (children.props.children) {
-        return getCodeText(children.props.children);
-      }
-      return '';
-    }
-    if (Array.isArray(children)) {
-      return children.map(getCodeText).join('');
-    }
-    return '';
-  };
-
   return (
     <div className="relative group">
       <pre className="relative rounded-lg bg-gray-800 p-4">
-        <CopyButton text={getCodeText(children)}/>
-        <code>{children}</code>
+        <CopyButton text={props.text}/>
+        <code>{props.children}</code>
       </pre>
     </div>
   );
@@ -139,25 +123,11 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
 
   useEffect(() => {
     if (chatWindowRef.current) {
-      observerRef.current = new MutationObserver((mutations) => {
-        // Only scroll if content was added/changed
-        if (mutations.some(m => m.type === 'childList' || m.type === 'characterData')) {
-          scrollToBottom();
-        }
-      });
-      observerRef.current.observe(chatWindowRef.current, {
-        childList: true,
-        subtree: true,
-        characterData: true
-      });
+      // Remove the MutationObserver since we'll handle scrolling directly
+      // during streaming instead of watching for DOM changes
+      scrollToBottom();
     }
-
-  return () => {
-    if (observerRef.current) {
-      observerRef.current.disconnect();
-    }
-  };
-}, [scrollToBottom]);
+  }, [currentChat?.messages, scrollToBottom]);
 
   useEffect(() => {
     scrollToBottom();
@@ -190,12 +160,14 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
     ctx.updateChat(currentChat);
     setInputText('');
     setIsStreaming(true);
+    scrollToBottom(); // Scroll after user message
 
     const message: Message = {
       role: 'assistant',
       content: '',
     };
     currentChat.messages.push(message);
+    scrollToBottom(); // Scroll after adding empty assistant message
 
     try {
       const completionRequest: CompletionRequest = {
@@ -205,32 +177,33 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
         stream: true,
       };
 
-  abortControllerRef.current = new AbortController();
-  const stream = await completionsHandler.handleCompletion(
-    completionRequest,
-    abortControllerRef.current.signal
-  );
+      abortControllerRef.current = new AbortController();
+      const stream = await completionsHandler.handleCompletion(
+        completionRequest,
+        abortControllerRef.current.signal
+      );
 
-  if (stream && Symbol.asyncIterator in stream) {
-    try {
-      for await (const chunk of stream) {
-        if (chunk.choices && chunk.choices.length > 0) {
-          const delta = chunk.choices[0].delta;
-          if (delta.content) {
-            message.content += delta.content;
-            currentChat.messages[currentChat.messages.length - 1] = { ...message };
-            ctx.updateChat(currentChat);
+      if (stream && Symbol.asyncIterator in stream) {
+        try {
+          for await (const chunk of stream) {
+            if (chunk.choices && chunk.choices.length > 0) {
+              const delta = chunk.choices[0].delta;
+              if (delta.content) {
+                message.content += delta.content;
+                currentChat.messages[currentChat.messages.length - 1] = { ...message };
+                ctx.updateChat(currentChat);
+                scrollToBottom(); // Scroll only when new content is added
+              }
+            }
+          }
+        } catch (error) {
+          if (error.name === 'AbortError') { /* empty */ } else {
+            throw error;
           }
         }
+      } else {
+        throw new Error('Expected a stream, but received a non-stream response');
       }
-    } catch (error) {
-      if (error.name === 'AbortError') { /* empty */ } else {
-        throw error;
-      }
-    }
-  } else {
-    throw new Error('Expected a stream, but received a non-stream response');
-  }
     } catch (error) {
       console.error('Error in API call:', error);
       currentChat.messages.pop();
@@ -311,21 +284,21 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
           const tree = starryNight.highlight(code.trim(), scope);
           const highlighted = toJsxRuntime(tree, { Fragment, jsx, jsxs });
           parts.push(
-            <CodeBlock key={match.index} language={lang}>
+            <CodeBlock key={match.index} language={lang} text={code}>
               <div className="code-header">{lang}</div>
               {highlighted}
             </CodeBlock>
           );
         } else {
           parts.push(
-            <CodeBlock key={match.index} language={lang}>
+            <CodeBlock key={match.index} language={lang} text={code}>
               {code}
             </CodeBlock>
           );
         }
       } else {
         parts.push(
-          <CodeBlock key={match.index}>
+          <CodeBlock key={match.index} text={code}>
             {code}
           </CodeBlock>
         );
