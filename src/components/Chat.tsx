@@ -98,7 +98,6 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
   const [starryNight, setStarryNight] = useState<any>(null);
   const chatWindowRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const observerRef = useRef<MutationObserver | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
@@ -132,6 +131,21 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
   useEffect(() => {
     scrollToBottom();
   }, [currentChat?.messages, scrollToBottom]);
+
+  const focusInput = useCallback(() => {
+    requestAnimationFrame(() => {
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!isStreaming) {
+      focusInput();
+    }
+  }, [isStreaming, focusInput]);
+
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -173,7 +187,7 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
       const completionRequest: CompletionRequest = {
         model: ctx.lastUsedModelID || "",
         messages: currentChat.messages,
-        max_tokens: 256,
+        max_tokens: 4196,
         stream: true,
       };
 
@@ -223,7 +237,6 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
       textareaRef.current.style.height = '56px';
     }
   };
-
   const adjustTextareaHeight = () => {
     const textarea = textareaRef.current;
     if (textarea) {
@@ -350,9 +363,12 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
                 value={inputText}
                 onChange={handleInputChange}
                 onKeyPress={handleKeyPress}
+                onBlur={focusInput} // Add this to refocus if focus is lost
                 placeholder="Type your message and press Enter to send..."
                 rows={1}
                 disabled={isStreaming}
+                autoFocus // Add this
+                style={{ outline: 'none' }} // Add this to prevent focus ring issues
               />
               <button
                 onClick={isStreaming ? handleStop : handleSend}
