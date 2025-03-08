@@ -103,27 +103,33 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
         stream: true,
       };
 
-      abortControllerRef.current = new AbortController();
-      const stream = await completionsHandler.handleCompletion(completionRequest);
+  abortControllerRef.current = new AbortController();
+  const stream = await completionsHandler.handleCompletion(
+    completionRequest,
+    abortControllerRef.current.signal
+  );
 
-      if (stream && Symbol.asyncIterator in stream) {
-
-        for await (const chunk of stream) {
-          if (abortControllerRef.current && abortControllerRef.current.signal.aborted) {
-            break;
-          }
-          if (chunk.choices && chunk.choices.length > 0) {
-            const delta = chunk.choices[0].delta;
-            if (delta.content) {
-              message.content += delta.content;
-              currentChat.messages[currentChat.messages.length - 1] = { ...message };
-              ctx.updateChat(currentChat);
-            }
+  if (stream && Symbol.asyncIterator in stream) {
+    try {
+      for await (const chunk of stream) {
+        if (chunk.choices && chunk.choices.length > 0) {
+          const delta = chunk.choices[0].delta;
+          if (delta.content) {
+            message.content += delta.content;
+            currentChat.messages[currentChat.messages.length - 1] = { ...message };
+            ctx.updateChat(currentChat);
           }
         }
-      } else {
-        throw new Error('Expected a stream, but received a non-stream response');
       }
+    } catch (error) {
+      if (error.name === 'AbortError') {
+      } else {
+        throw error;
+      }
+    }
+  } else {
+    throw new Error('Expected a stream, but received a non-stream response');
+  }
     } catch (error) {
       console.error('Error in API call:', error);
       currentChat.messages.pop();
