@@ -98,6 +98,7 @@ textarea::placeholder {
 
 .ai-message {
   color: white;
+  width: 43rem;
   align-self: flex-start;
 }
 
