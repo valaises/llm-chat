@@ -150,6 +150,7 @@ textarea::placeholder {
 }
 
 .message pre {
+  position: relative;
   background-color: #282a36;
   border-radius: 6px;
   padding: 1em;
@@ -272,4 +273,35 @@ textarea::placeholder {
     transform: scale(0.95);
     opacity: 0.7;
   }
+}
+
+/* Add this near the code block styles section */
+.copy-button {
+  position: absolute;
+  right: 1rem;
+  top: 0.5rem;
+  padding: 0.3rem 0.4rem;
+  border-radius: 0.375rem;
+  background-color: rgba(55, 65, 81, 0.5);
+  transition: background-color 0.2s, opacity 0.2s;
+  opacity: 0;
+  z-index: 10;
+}
+
+.copy-button:hover {
+  background-color: rgba(75, 85, 99, 0.5);
+}
+
+.group:hover .copy-button {
+  opacity: 1;
+}
+
+.copy-button svg {
+  width: 1rem;
+  height: 1rem;
+  color: rgb(209, 213, 219);
+}
+
+.copy-button.copied svg {
+  color: rgb(74, 222, 128);
 }

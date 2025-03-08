@@ -45,13 +45,12 @@ const CopyButton: React.FC<CopyButtonProps> = ({ text }) => {
   return (
     <button
       onClick={handleCopy}
-      className="absolute right-2 top-2 p-2 rounded-md bg-gray-700 hover:bg-gray-600 transition-colors"
+      className={`copy-button ${copied ? 'copied' : ''}`}
       aria-label={copied ? 'Copied!' : 'Copy to clipboard'}
     >
       {copied ? (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5 text-green-400"
           viewBox="0 0 20 20"
           fill="currentColor"
         >
@@ -64,12 +63,11 @@ const CopyButton: React.FC<CopyButtonProps> = ({ text }) => {
       ) : (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5 text-gray-300"
           viewBox="0 0 20 20"
           fill="currentColor"
         >
-          <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-          <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+          <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/>
+          <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"/>
         </svg>
       )}
     </button>
@@ -81,10 +79,13 @@ interface CodeBlockProps {
   language?: string;
 }
 
-const CodeBlock: React.FC<CodeBlockProps> = ({ children }) => {
+const CodeBlock: React.FC<CodeBlockProps> = ({children}) => {
   // Convert children to string if it's a plain text node
   const getCodeText = (children: React.ReactNode): string => {
-    if (typeof children === 'string') return children;
+    if (typeof children === 'string') {
+      // Remove language identifier if it's at the start of the string
+      return children.replace(/^(python|rust|typescript|javascript|java|cpp|cs|go|php|html|css|sql|json|yaml|xml|bash|sh|text)\b/, '').trim();
+    }
     if (React.isValidElement(children)) {
       if (children.props.children) {
         return getCodeText(children.props.children);
@@ -100,7 +101,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ children }) => {
   return (
     <div className="relative group">
       <pre className="relative rounded-lg bg-gray-800 p-4">
-        <CopyButton text={getCodeText(children)} />
+        <CopyButton text={getCodeText(children)}/>
         <code>{children}</code>
       </pre>
     </div>
