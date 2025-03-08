@@ -5,6 +5,7 @@ import './Chat.css';
 import { getCurrentChat } from '../utils';
 import { CompletionsHandler } from '../completions';
 
+
 interface ChatProps {
   sidebarOpen: boolean;
   ctx: ChatContextType;
@@ -26,25 +27,35 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
 
   const scrollToBottom = useCallback(() => {
     if (chatWindowRef.current) {
-      chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
+      const scrollElement = chatWindowRef.current;
+      // Use requestAnimationFrame to ensure DOM updates are complete
+      requestAnimationFrame(() => {
+        scrollElement.scrollTop = scrollElement.scrollHeight;
+      });
     }
   }, []);
 
   useEffect(() => {
     if (chatWindowRef.current) {
-      observerRef.current = new MutationObserver(scrollToBottom);
+      observerRef.current = new MutationObserver((mutations) => {
+        // Only scroll if content was added/changed
+        if (mutations.some(m => m.type === 'childList' || m.type === 'characterData')) {
+          scrollToBottom();
+        }
+      });
       observerRef.current.observe(chatWindowRef.current, {
         childList: true,
         subtree: true,
+        characterData: true
       });
     }
 
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-    };
-  }, [scrollToBottom]);
+  return () => {
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+  };
+}, [scrollToBottom]);
 
   useEffect(() => {
     scrollToBottom();
@@ -98,7 +109,6 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
       if (stream && Symbol.asyncIterator in stream) {
 
         for await (const chunk of stream) {
-          // todo: doesn't work
           if (abortControllerRef.current && abortControllerRef.current.signal.aborted) {
             break;
           }
