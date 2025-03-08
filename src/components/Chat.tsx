@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { ModelSelector } from './ModelSelector';
 import { Message, ChatContextType, CompletionRequest } from '../types';
 import './Chat.css';
 import { getCurrentChat } from '../utils';
 import { CompletionsHandler } from '../completions';
-
 
 interface ChatProps {
   sidebarOpen: boolean;
@@ -183,7 +185,29 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
                 key={index}
                 className={`message ${message.role === "user" ? 'user-message' : 'ai-message'}`}
               >
-                {message.content}
+                <ReactMarkdown
+                  components={{
+                    code({node, inline, className, children, ...props}) {
+                      const match = /language-(\w+)/.exec(className || '')
+                      return !inline && match ? (
+                        <SyntaxHighlighter
+                          style={dracula}
+                          language={match[1]}
+                          PreTag="div"
+                          {...props}
+                        >
+                          {String(children).replace(/\n$/, '')}
+                        </SyntaxHighlighter>
+                      ) : (
+                        <code className={className} {...props}>
+                          {children}
+                        </code>
+                      )
+                    }
+                  }}
+                >
+                  {message.content}
+                </ReactMarkdown>
                 {isStreaming && index === currentChat.messages.length - 1 && message.role === 'assistant' && (
                   <span className="pulsing-circle"></span>
                 )}
