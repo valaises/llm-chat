@@ -33,7 +33,7 @@ A modern chat interface for Large Language Models (LLMs) built with React, TypeS
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/valaises/llm-chat.git
 cd llm-chatui
 ```
 
