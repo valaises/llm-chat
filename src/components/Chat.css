@@ -1,3 +1,65 @@
+/* Markdown styles */
+.message h1, .message h2, .message h3, .message h4, .message h5, .message h6 {
+  margin: 1em 0 0.5em 0;
+  color: #e6edf3;
+}
+
+.message p {
+  margin: 0.5em 0;
+}
+
+.message strong {
+  font-weight: bold;
+}
+
+.message em {
+  font-style: italic;
+}
+
+.message ul, .message ol {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+}
+
+.message blockquote {
+  border-left: 3px solid #4a4a4a;
+  margin: 0.5em 0;
+  padding-left: 1em;
+  color: #8b949e;
+}
+
+/* Code block styles */
+.code-block {
+  /*background-color: #1e1e1e;*/
+  /*border-radius: 6px;*/
+  /*padding: 1em;*/
+  /*margin: 0.5em 0;*/
+  /*overflow-x: auto;*/
+}
+
+.code-header {
+  background-color: #2d2d2d;
+  padding: 0.5em 1em;
+  margin: -1em -1em 1em -1em;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  color: #e0e0e0;
+  font-size: 0.9em;
+}
+
+code {
+  /*font-family: 'Fira Code', monospace;*/
+  /*font-size: 0.9em;*/
+}
+
+/* Inline code */
+:not(pre) > code {
+  background-color: rgba(110, 118, 129, 0.4);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
 .model-selector-container {
   position: absolute;
   top: 16px;
@@ -82,8 +144,7 @@ textarea::placeholder {
 }
 
 .message {
-  padding: 3px 15px;
-  /*border-radius: 8px;*/
+  padding: 10px 15px;
   max-width: 80%;
   word-wrap: break-word;
 }
@@ -118,7 +179,7 @@ textarea::placeholder {
   border-left: 3px solid #4a4a4a;
   margin: 0.5em 0;
   padding-left: 1em;
-  color: #888;
+  /*color: #888;*/
 }
 
 .message table {

@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { ModelSelector } from './ModelSelector';
 import { Message, ChatContextType, CompletionRequest } from '../types';
 import './Chat.css';
 import { getCurrentChat } from '../utils';
 import { CompletionsHandler } from '../completions';
+import { common, createStarryNight } from '@wooorm/starry-night';
+import { toJsxRuntime } from 'hast-util-to-jsx-runtime';
+import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
+import ReactMarkdown from 'markdown-to-jsx';
+
 
 interface ChatProps {
   sidebarOpen: boolean;
@@ -16,10 +18,15 @@ interface ChatProps {
 export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
   const [inputText, setInputText] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
+  const [starryNight, setStarryNight] = useState<any>(null);
   const chatWindowRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const observerRef = useRef<MutationObserver | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    createStarryNight(common).then(setStarryNight);
+  }, []);
 
   const currentChat = getCurrentChat(ctx.chats, ctx.currentChatID)!;
   const completionsHandler = new CompletionsHandler(
@@ -124,8 +131,7 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
         }
       }
     } catch (error) {
-      if (error.name === 'AbortError') {
-      } else {
+      if (error.name === 'AbortError') { /* empty */ } else {
         throw error;
       }
     }
@@ -169,6 +175,85 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
     adjustTextareaHeight();
   };
 
+  const renderMarkdownWithCode = (content: string) => {
+    if (!starryNight) return content;
+
+    const preprocessContent = (text: string) => {
+      const lines = text.split('\n');
+      let backQuotesOpened = false;
+
+      for (const line of lines) {
+        if (line.includes('```')) {
+          backQuotesOpened = !backQuotesOpened;
+        }
+      }
+
+      if (backQuotesOpened) {
+        return text + '\n```';
+      }
+      return text;
+    };
+
+    const processedContent = preprocessContent(content);
+    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+    let lastIndex = 0;
+    const parts = [];
+    let match;
+
+    while ((match = codeBlockRegex.exec(processedContent)) !== null) {
+      // Add text before code block as markdown
+      if (match.index > lastIndex) {
+        const textContent = processedContent.slice(lastIndex, match.index);
+        parts.push(
+          <ReactMarkdown key={`md-${match.index}`}>
+            {textContent}
+          </ReactMarkdown>
+        );
+      }
+
+      const [, lang, code] = match;
+      if (lang) {
+        const scope = starryNight.flagToScope(lang);
+        if (scope) {
+          const tree = starryNight.highlight(code.trim(), scope);
+          const highlighted = toJsxRuntime(tree, { Fragment, jsx, jsxs });
+          parts.push(
+            <pre key={match.index} className="code-block">
+              <div className="code-header">{lang}</div>
+              <code>{highlighted}</code>
+            </pre>
+          );
+        } else {
+          parts.push(
+            <pre key={match.index} className="code-block">
+              <code>{code}</code>
+            </pre>
+          );
+        }
+      } else {
+        parts.push(
+          <pre key={match.index} className="code-block">
+            <code>{code}</code>
+          </pre>
+        );
+      }
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Add remaining text as markdown
+    if (lastIndex < processedContent.length) {
+      const remainingContent = processedContent.slice(lastIndex);
+      parts.push(
+        <ReactMarkdown key={`md-${lastIndex}`}>
+          {remainingContent}
+        </ReactMarkdown>
+      );
+    }
+
+    return parts;
+  };
+
   return (
     <div className={`main-content ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
       <div className="model-selector-container">
@@ -185,29 +270,7 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
                 key={index}
                 className={`message ${message.role === "user" ? 'user-message' : 'ai-message'}`}
               >
-                <ReactMarkdown
-                  components={{
-                    code({node, inline, className, children, ...props}) {
-                      const match = /language-(\w+)/.exec(className || '')
-                      return !inline && match ? (
-                        <SyntaxHighlighter
-                          style={dracula}
-                          language={match[1]}
-                          PreTag="div"
-                          {...props}
-                        >
-                          {String(children).replace(/\n$/, '')}
-                        </SyntaxHighlighter>
-                      ) : (
-                        <code className={className} {...props}>
-                          {children}
-                        </code>
-                      )
-                    }
-                  }}
-                >
-                  {message.content}
-                </ReactMarkdown>
+                {renderMarkdownWithCode(message.content)}
                 {isStreaming && index === currentChat.messages.length - 1 && message.role === 'assistant' && (
                   <span className="pulsing-circle"></span>
                 )}

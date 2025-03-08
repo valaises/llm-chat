@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@wooorm/starry-night": "^3.6.0",
+    "hast-util-to-jsx-runtime": "^2.3.6",
+    "markdown-to-jsx": "^7.7.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-markdown": "^10.1.0",
