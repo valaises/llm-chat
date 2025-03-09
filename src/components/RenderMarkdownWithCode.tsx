@@ -2,6 +2,7 @@ import { toJsxRuntime } from 'hast-util-to-jsx-runtime';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
 import ReactMarkdown from 'markdown-to-jsx';
 import {CodeBlock} from "./CodeBlock.tsx";
+import '@wooorm/starry-night/style/both';
 
 
 export const renderMarkdownWithCode = (content: string, starryNight) => {
@@ -50,7 +51,9 @@ export const renderMarkdownWithCode = (content: string, starryNight) => {
         parts.push(
           <CodeBlock key={match.index} language={lang} text={code}>
             <div className="code-header">{lang}</div>
-            {highlighted}
+            <pre className={`highlight highlight-${scope.replace(/^source\./, '').replace(/\./g, '-')}`}>
+              <code>{highlighted}</code>
+            </pre>
           </CodeBlock>
         );
       } else {
