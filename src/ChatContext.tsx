@@ -140,8 +140,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [chats, currentChatID]);
 
-  console.log('ChatContext init: currentChatID: ', currentChatID);
-
   return (
     <ChatContext.Provider value={{
       chats: chats,
