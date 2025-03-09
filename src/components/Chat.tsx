@@ -83,15 +83,15 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
     }
   }, []);
 
-  useEffect(() => {
-    if (chatWindowRef.current) {
-      scrollToBottom();
-    }
-  }, [currentChat?.messages, scrollToBottom]);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [currentChat?.messages, scrollToBottom]);
+  // useEffect(() => {
+  //   if (chatWindowRef.current) {
+  //     scrollToBottom();
+  //   }
+  // }, [currentChat?.messages, scrollToBottom]);
+  //
+  // useEffect(() => {
+  //   scrollToBottom();
+  // }, [currentChat?.messages, scrollToBottom]);
 
   const focusInput = useCallback(() => {
     requestAnimationFrame(() => {
@@ -172,7 +172,6 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
                 message.content += delta.content;
                 currentChat.messages[currentChat.messages.length - 1] = { ...message };
                 ctx.updateChat(currentChat);
-                scrollToBottom(); // Scroll only when new content is added
               }
             }
           }
