@@ -21,12 +21,53 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
   const chatWindowRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const [isTitleGenerating, setIsTitleGenerating] = useState(false);
+
+  const generateChatTitle = async () => {
+    if (isTitleGenerating) return;
+
+    const currentChat = getCurrentChat(ctx.chats, ctx.currentChatID)!;
+    if (currentChat.name !== '' || currentChat.messages.length < 3) return;
+
+    setIsTitleGenerating(true);
+    try {
+      const titlePrompt: Message = {
+        role: "user",
+        content: "Generate a very short (2-4 words) title for this conversation. Respond with just the title, no quotes or additional text."
+      };
+
+      const completionRequest: CompletionRequest = {
+        model: ctx.lastUsedModelID || "",
+        messages: [...currentChat.messages, titlePrompt],
+        max_tokens: 20,
+        stream: false
+      };
+
+      const response = await completionsHandler.handleCompletion(completionRequest);
+      if (response && response.choices && response.choices.length > 0) {
+        const title = response.choices[0].message.content;
+        currentChat.name = title;
+        ctx.updateChat(currentChat);
+      }
+    } catch (error) {
+      console.error('Error generating chat title:', error);
+    } finally {
+      setIsTitleGenerating(false);
+    }
+  };
 
   useEffect(() => {
     createStarryNight(common).then(setStarryNight);
   }, []);
 
   const currentChat = getCurrentChat(ctx.chats, ctx.currentChatID)!;
+
+  useEffect(() => {
+    if (currentChat?.messages.length >= 3 && currentChat.name === '') {
+      generateChatTitle();
+    }
+  }, [currentChat?.messages.length]);
+
   const completionsHandler = new CompletionsHandler(
     ctx.endpointURL || "",
     ctx.endpointAPIKey || "",

@@ -45,7 +45,6 @@ export const renderMarkdownWithCode = (content: string, starryNight) => {
     if (lang) {
       const scope = starryNight.flagToScope(lang);
       if (scope) {
-        console.log(`scope: ${scope}`)
         const tree = starryNight.highlight(code.trim(), scope);
         const highlighted = toJsxRuntime(tree, { Fragment, jsx, jsxs });
         parts.push(
