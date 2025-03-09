@@ -123,7 +123,28 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
     }
   };
 
+  const scrollToLastUserMessage = useCallback(() => {
+    if (chatWindowRef.current) {
+      const scrollElement = chatWindowRef.current;
+      const messages = scrollElement.querySelectorAll('.message.user-message');
+      const lastUserMessage = messages[messages.length - 1];
+
+      if (lastUserMessage) {
+        // Calculate the scroll position that will place the last user message at the top
+        const messageTop = lastUserMessage.getBoundingClientRect().top;
+        const containerTop = scrollElement.getBoundingClientRect().top;
+        const scrollTop = messageTop - containerTop + scrollElement.scrollTop;
+
+        scrollElement.scrollTo({
+          top: scrollTop,
+          behavior: 'smooth'
+        });
+      }
+    }
+  }, []);
+
   const handleSend = async () => {
+    let scrolls_before_stop = 10;
     if (inputText.trim() === '' || isStreaming) return;
 
     const userMessage: Message = {
@@ -147,7 +168,8 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
       content: '',
     };
     currentChat.messages.push(message);
-    scrollToBottom(); // Scroll after adding empty assistant message
+
+    scrollToLastUserMessage();
 
     try {
       const completionRequest: CompletionRequest = {
@@ -166,6 +188,10 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
       if (stream && Symbol.asyncIterator in stream) {
         try {
           for await (const chunk of stream) {
+            if (scrolls_before_stop) {
+              scrollToBottom();
+              scrolls_before_stop -= 1;
+            }
             if (chunk.choices && chunk.choices.length > 0) {
               const delta = chunk.choices[0].delta;
               if (delta.content) {
@@ -224,8 +250,8 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
             ))}
           </div>
         </div>
-          <div className="input-container">
-            <div className="textarea-wrapper">
+        <div className="input-container">
+          <div className="textarea-wrapper">
               <textarea
                 ref={textareaRef}
                 value={inputText}
@@ -234,15 +260,15 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
                 placeholder="Type your message and press Enter to send..."
                 rows={1}
                 disabled={isStreaming}
-                style={{ outline: 'none' }}
+                style={{outline: 'none'}}
               />
-              <button
-                onClick={isStreaming ? handleStop : handleSend}
-                className="send-button"
-              >{isStreaming ? 'Stop' : 'Send'}</button>
-            </div>
-            <div className="chat-tools">
-              <button
+            <button
+              onClick={isStreaming ? handleStop : handleSend}
+              className="send-button"
+            >{isStreaming ? 'Stop' : 'Send'}</button>
+          </div>
+          <div className="chat-tools">
+          <button
                 className={`pill-button`}
                 // className={`pill-button ${isPillActive ? 'active' : ''}`}
                 // onClick={handlePillClick}
