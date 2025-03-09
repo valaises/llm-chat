@@ -37,16 +37,6 @@
   /*overflow-x: auto;*/
 }
 
-.code-header {
-  background-color: #2d2d2d;
-  padding: 0.5em 1em;
-  margin: -1em -1em 1em -1em;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-  color: #e0e0e0;
-  font-size: 0.9em;
-}
-
 code {
   /*font-family: 'Fira Code', monospace;*/
   /*font-size: 0.9em;*/
@@ -74,12 +64,50 @@ code {
   display: flex;
   flex-direction: column;
   align-items: center;
+  top: calc(4rem + 0.4rem);
+}
+
+.input-container {
+  width: 100%;
+  padding-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  height: 4.5rem;
 }
 
 .input-container > * {
-  /*width: 70%;*/
   margin-left: 15%;
   margin-right: calc(15% + var(--sidebar-closed-width));
+}
+
+.chat-tools {
+  position: absolute;
+  left: 0;
+  bottom: 0.4rem;
+  display: flex;
+  gap: 8px;
+}
+
+.pill-button {
+  padding: 4px 12px;
+  border-radius: 16px;
+  border: 1px solid #4a4a4a;
+  background-color: transparent;
+  color: #666;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.pill-button:hover {
+  background-color: #4a4a4a;
+  color: #e6edf3;
+}
+
+.pill-button.active {
+  background-color: #4a9eff;
+  border-color: #4a9eff;
+  color: white;
 }
 
 .textarea-wrapper {
@@ -89,14 +117,37 @@ code {
 
 .send-button {
   position: absolute;
-  right: 10px;
-  bottom: 10px;
+  right: 0.8rem;
+  bottom: 1.8rem;
   background: none;
   border: none;
   cursor: pointer;
   padding: 5px;
   align-items: center;
 
+}
+
+textarea {
+  width: 100%;
+  min-height: 56px;
+  max-height: 200px;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background-color: #303030;
+  color: white;
+  font-size: 14px;
+  resize: none;
+  outline: none;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  overflow-y: auto;
+  line-height: 1.5;
+  position: absolute;
+  bottom: 1.1rem;
+  transform-origin: bottom;
 }
 
 textarea:focus {
@@ -149,11 +200,21 @@ textarea::placeholder {
   word-wrap: break-word;
 }
 
+.code-header {
+  background-color: #2d2d2d;
+  padding: 0.5em 1em;
+  margin: -1em -1em 1em -1em;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  color: #e0e0e0;
+  font-size: 0.9em;
+}
+
 .message pre {
   position: relative;
   background-color: #282a36;
   border-radius: 6px;
-  padding: 1em;
+  padding: 1em 1em 0 0.65em;
   margin: 0.5em 0;
   overflow-x: auto;
 }
@@ -211,43 +272,6 @@ textarea::placeholder {
   color: white;
   width: 43rem;
   align-self: flex-start;
-}
-
-
-/* shouldn't have background color*/
-.input-container {
-  width: 100%;
-  padding: 20px;
-  display: flex;
-  justify-content: center;
-}
-
-textarea {
-  width: 100%;
-  min-height: 56px;
-  max-height: 200px;
-  padding: 15px;
-  border-radius: 8px;
-  border: 1px solid #333;
-  background-color: #303030;
-  color: white;
-  font-size: 14px;
-  resize: none;
-  outline: none;
-  transition: border-color 0.3s;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  overflow-y: auto;
-  line-height: 1.5;
-}
-
-textarea:focus {
-  border-color: #4a9eff;
-}
-
-textarea::placeholder {
-  color: #666;
 }
 
 .pulsing-circle {

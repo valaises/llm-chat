@@ -137,6 +137,11 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
     setIsStreaming(true);
     scrollToBottom(); // Scroll after user message
 
+    // Reset textarea height after sending
+    if (textareaRef.current) {
+      textareaRef.current.style.height = '56px';
+    }
+
     const message: Message = {
       role: 'assistant',
       content: '',
@@ -192,11 +197,6 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
       setIsStreaming(false);
       abortControllerRef.current = null;
     }
-
-    // Reset textarea height after sending
-    if (textareaRef.current) {
-      textareaRef.current.style.height = '56px';
-    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -242,8 +242,24 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
                 className="send-button"
               >{isStreaming ? 'Stop' : 'Send'}</button>
             </div>
+            <div className="chat-tools">
+              <button
+                className={`pill-button`}
+                // className={`pill-button ${isPillActive ? 'active' : ''}`}
+                // onClick={handlePillClick}
+              >
+                Deep Research
+              </button>
+              <button
+                className={`pill-button`}
+                // className={`pill-button ${isPillActive ? 'active' : ''}`}
+                // onClick={handlePillClick}
+              >
+                Websearch
+              </button>
+            </div>
           </div>
-        </div>
       </div>
+    </div>
   );
 };
