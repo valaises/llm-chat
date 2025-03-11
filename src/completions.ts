@@ -1,6 +1,72 @@
 import { CompletionRequest, CompletionResponse, CompletionResponseChunk } from './types';
 
 
+export async function *completionResponseChunkCollector(chunks: AsyncGenerator<CompletionResponseChunk, void, unknown>) {
+  let currentToolCall: any = null;
+
+  for await (const chunk of chunks) {
+    if (!chunk.choices) {
+      continue;
+    }
+
+    for (const choice of chunk.choices) {
+      const delta = choice.delta || {};
+
+      // Handle content deltas
+      if (delta.content !== undefined && delta.content !== null) {
+        yield {
+          type: "content_delta",
+          content: delta.content
+        };
+      }
+
+      // Handle tool calls
+      if (delta.tool_calls !== undefined && Array.isArray(delta.tool_calls)) {
+        for (const toolCall of delta.tool_calls) {
+          if (toolCall.index !== undefined) {
+            // New tool call started
+            if (currentToolCall === null) {
+              currentToolCall = {
+                id: toolCall.id,
+                type: toolCall.type,
+                function: {
+                  name: toolCall.function?.name,
+                  arguments: ''
+                }
+              };
+            }
+          }
+
+          // Append arguments if present
+          if (toolCall.function?.arguments !== undefined) {
+            currentToolCall.function.arguments += toolCall.function.arguments;
+          }
+
+          // Update other fields if present
+          if (toolCall.id) {
+            currentToolCall.id = toolCall.id;
+          }
+          if (toolCall.type) {
+            currentToolCall.type = toolCall.type;
+          }
+          if (toolCall.function?.name) {
+            currentToolCall.function.name = toolCall.function.name;
+          }
+        }
+      }
+
+      // Yield tool call when complete
+      if (choice.finish_reason === 'tool_calls' && currentToolCall !== null) {
+        yield {
+          type: "tool_call",
+          content: currentToolCall
+        };
+        currentToolCall = null;
+      }
+    }
+  }
+}
+
 export class CompletionsHandler {
   private apiUrl: string;
   private apiKey: string;
@@ -13,13 +79,13 @@ export class CompletionsHandler {
   async handleCompletion(
     requestData: CompletionRequest,
     signal?: AbortSignal
-  ): Promise<CompletionResponse | AsyncGenerator<CompletionResponseChunk, void, unknown>> {
+  ): Promise<CompletionResponse | AsyncGenerator<any, void, unknown>> {
     const streaming = requestData.stream ?? false;
 
     if (!streaming) {
       return this.nonStreamingCompletion(requestData, signal);
     } else {
-      return this.streamingCompletion(requestData, signal);
+      return completionResponseChunkCollector(this.streamingCompletion(requestData, signal));
     }
   }
 

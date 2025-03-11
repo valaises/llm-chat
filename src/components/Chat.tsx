@@ -192,14 +192,17 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
               scrollToBottom();
               scrolls_before_stop -= 1;
             }
-            if (chunk.choices && chunk.choices.length > 0) {
-              const delta = chunk.choices[0].delta;
-              if (delta.content) {
-                message.content += delta.content;
-                currentChat.messages[currentChat.messages.length - 1] = { ...message };
-                ctx.updateChat(currentChat);
-              }
+            if (chunk.type === "content_delta") {
+              message.content += chunk.content;
             }
+            if (chunk.type === "tool_call") {
+              if (!message.tool_calls) {
+                message.tool_calls = [];
+              }
+              message.tool_calls.push(chunk.content);
+            }
+            currentChat.messages[currentChat.messages.length - 1] = { ...message };
+            ctx.updateChat(currentChat);
           }
         } catch (error) {
           if (error.name === 'AbortError') { /* empty */ } else {

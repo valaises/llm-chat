@@ -26,6 +26,7 @@ export interface ChatContextType {
 export interface Message {
   role: string;
   content: string;
+  tool_calls?: any[]
 }
 
 export interface Chat {
@@ -70,10 +71,18 @@ export interface CompletionResponseChunk {
     delta: {
       role?: string;
       content?: string;
+      refusal?: any;
+      function_call?: any;
+      tool_calls?: any;
+      audio?: any;
     };
     logprobs: any | null;
     finish_reason: string | null;
   }[];
+  stream_options?: {
+    include_usage: boolean;
+  };
+  citations?: any;
 }
 
 export interface CompletionModel {
