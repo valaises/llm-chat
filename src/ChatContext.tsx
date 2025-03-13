@@ -80,6 +80,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [endpointAPIKey, _setEndpointAPIKey] = useState<string | undefined>(getEndpointAPIKey());
   const [sidebarOpen, _setSidebarOpen] = useState<boolean>(getSidebarOpen());
   const [models, _setModels] = useState<CompletionModel[]>([]);
+  const [tools, _setTools] = useState<any[]>([]);
 
   useEffect(() => {
     setChats(chats);
@@ -134,6 +135,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     _setModels(newModels);
   }
 
+  const updateTools = (newTools: any[]) => {
+    _setTools(newTools);
+  }
+
   useEffect(() => {
     if (!chats.some(chat => chat.id === currentChatID) && chats.length > 0) {
       updateCurrentChatId(chats[chats.length - 1].id);
@@ -163,6 +168,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       models: models,
       setModels: updateModels,
+
+      tools: tools,
+      setTools: updateTools,
     }}>
       {children}
     </ChatContext.Provider>

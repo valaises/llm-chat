@@ -5,6 +5,15 @@ export async function *completionResponseChunkCollector(chunks: AsyncGenerator<C
   let currentToolCall: any = null;
 
   for await (const chunk of chunks) {
+    console.log(chunk)
+    if (chunk.object === "tool_res_messages") {
+      yield {
+        type: "tool_res_messages",
+        content: chunk.tool_res_messages!
+      }
+      continue;
+    }
+
     if (!chunk.choices) {
       continue;
     }
@@ -124,7 +133,6 @@ export class CompletionsHandler {
       body: JSON.stringify({ ...requestData, stream: true }),
       signal
     });
-    console.log(`URL: ${this.apiUrl}; KEY: ${this.apiKey}; data: ${JSON.stringify({ ...requestData, stream: true })}`);
 
     if (!response.ok) {
       throw new Error(`API request failed: ${response.statusText}`);

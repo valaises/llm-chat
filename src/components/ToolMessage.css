@@ -1,0 +1,25 @@
+.tool-message > * {
+  user-select: none;
+}
+
+.tool-message-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+  opacity: 0;
+}
+
+.tool-message-content.visible {
+  max-height: 100px; /* Adjust as needed */
+  opacity: 1;
+}
+
+.tool-message-content.hidden {
+  max-height: 0;
+  opacity: 0;
+}
+
+.tool-message-icon {
+  margin-right: 0.5em; /* Adjust the spacing as needed */
+  font-size: 0.85em
+}

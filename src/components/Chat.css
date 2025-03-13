@@ -189,15 +189,23 @@ textarea::placeholder {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
   width: 70%;
   max-width: 1200px;
 }
 
 .message {
+  margin-bottom: 13px;
   padding: 10px 15px;
   max-width: 80%;
   word-wrap: break-word;
+}
+
+.tool-message {
+
+  font-size: 0.9em;
+  word-wrap: break-word;
+  padding: 0 0 0 0.2rem;
+  margin-bottom: 0;
 }
 
 .code-header {

@@ -21,12 +21,22 @@ export interface ChatContextType {
 
   models: CompletionModel[];
   setModels: (newModels: CompletionModel[]) => void;
+
+  tools: any[];
+  setTools: (newTools: any[]) => void;
 }
 
 export interface Message {
   role: string;
   content: string;
   tool_calls?: any[]
+  tool_call_id?: string;
+}
+
+export interface MessageRender {
+  type: string,
+  content: string,
+  tool_name?: string,
 }
 
 export interface Chat {
@@ -40,6 +50,7 @@ export interface CompletionRequest {
   messages: Message[];
   max_tokens?: number;
   stream?: boolean;
+  tools?: any[];
 }
 
 export interface CompletionResponse {
@@ -83,6 +94,8 @@ export interface CompletionResponseChunk {
     include_usage: boolean;
   };
   citations?: any;
+
+  tool_res_messages?: Message[];
 }
 
 export interface CompletionModel {
@@ -97,3 +110,6 @@ export interface ModelListResponse {
   data: CompletionModel[];
 }
 
+export interface ChatToolResponse{
+  tools: any[];
+}

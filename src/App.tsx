@@ -9,6 +9,7 @@ import { useChat } from "./UseChat.ts";
 import { ModelsHandler } from './models'
 
 import './App.css'
+import {ToolsHandler} from "./tools.ts";
 
 function App() {
   return (
@@ -34,22 +35,31 @@ function AppContent() {
     ctx.setCurrentChatID(newChat.id);
   };
 
-  const fetchModels = async () => {
+  const fetchModelsAndTools = async () => {
     if (ctx.endpointURL && ctx.endpointAPIKey) {
       const modelsHandler = new ModelsHandler(ctx.endpointURL, ctx.endpointAPIKey);
+      const toolsHandler = new ToolsHandler(ctx.endpointURL, ctx.endpointAPIKey);
+
       try {
         const models = await modelsHandler.listModels();
         ctx.setModels(models);
       } catch (error) {
-        console.error('Failed to fetch models:', error);
+        console.error('Failed to fetch models: ', error);
+      }
+
+      try {
+        const response = await toolsHandler.listTools();
+        ctx.setTools(response.tools);
+      } catch (error) {
+        console.error('Failed to fetch tools: ', error);
       }
     }
   };
 
   useEffect(() => {
-    fetchModels();
+    fetchModelsAndTools();
 
-    const intervalId = setInterval(fetchModels, 30000);
+    const intervalId = setInterval(fetchModelsAndTools, 30000);
 
     // Clean up the interval when the component unmounts
     return () => clearInterval(intervalId);

@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ModelSelector } from './ModelSelector';
-import { Message, ChatContextType, CompletionRequest } from '../types';
+import { Message, MessageRender, ChatContextType, CompletionRequest } from '../types';
 import './Chat.css';
 import { getCurrentChat } from '../utils';
 import { CompletionsHandler } from '../completions';
 import { common, createStarryNight } from '@wooorm/starry-night';
-import {renderMarkdownWithCode} from "./RenderMarkdownWithCode.tsx";
+import {renderMessageInChat} from "./RenderMarkdownWithCode.tsx";
 import {adjustTextareaHeight} from "./chatUtils.ts";
 
 
@@ -111,7 +111,7 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      handleSend("user");
     }
   };
 
@@ -143,31 +143,36 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
     }
   }, []);
 
-  const handleSend = async () => {
+  const handleSend = async (caller: string) => {
     let scrolls_before_stop = 10;
-    if (inputText.trim() === '' || isStreaming) return;
 
-    const userMessage: Message = {
-      role: "user",
-      content: inputText,
-    };
+    if (caller === "user") {
+      if (inputText.trim() === '' || isStreaming) return;
 
-    currentChat.messages.push(userMessage);
-    ctx.updateChat(currentChat);
-    setInputText('');
-    setIsStreaming(true);
-    scrollToBottom(); // Scroll after user message
+      const userMessage: Message = {
+        role: "user",
+        content: inputText,
+      };
 
-    // Reset textarea height after sending
-    if (textareaRef.current) {
-      textareaRef.current.style.height = '56px';
+      currentChat.messages.push(userMessage);
+      ctx.updateChat(currentChat);
+      setInputText('');
+
+      // Reset textarea height after sending
+      if (textareaRef.current) {
+        textareaRef.current.style.height = '56px';
+      }
+
     }
+
+    scrollToBottom(); // Scroll after user message
+    setIsStreaming(true);
 
     const message: Message = {
       role: 'assistant',
       content: '',
     };
-    currentChat.messages.push(message);
+    let assistant_message_pushed = false;
 
     scrollToLastUserMessage();
 
@@ -178,6 +183,9 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
         max_tokens: 4196,
         stream: true,
       };
+      if (ctx.tools.length) {
+        completionRequest.tools = ctx.tools;
+      }
 
       abortControllerRef.current = new AbortController();
       const stream = await completionsHandler.handleCompletion(
@@ -193,17 +201,37 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
               scrolls_before_stop -= 1;
             }
             if (chunk.type === "content_delta") {
+              if (!assistant_message_pushed) {
+                currentChat.messages.push(message);
+                assistant_message_pushed = true;
+              }
               message.content += chunk.content;
+              currentChat.messages[currentChat.messages.length - 1] = { ...message };
             }
             if (chunk.type === "tool_call") {
+              if (!assistant_message_pushed) {
+                currentChat.messages.push(message);
+                assistant_message_pushed = true;
+              }
               if (!message.tool_calls) {
                 message.tool_calls = [];
               }
               message.tool_calls.push(chunk.content);
+              currentChat.messages[currentChat.messages.length - 1] = { ...message };
             }
-            currentChat.messages[currentChat.messages.length - 1] = { ...message };
+            if (chunk.type === "tool_res_messages") {
+              console.log(`received tool_res_messages: ${chunk.content}`)
+              currentChat.messages = currentChat.messages.concat(chunk.content)
+            }
+
             ctx.updateChat(currentChat);
           }
+
+          if (currentChat.messages[currentChat.messages.length -1].tool_calls?.length) {
+            console.log("repeating handleSend due to tool calls");
+            await handleSend("assistant");
+          }
+
         } catch (error) {
           if (error.name === 'AbortError') { /* empty */ } else {
             throw error;
@@ -232,6 +260,64 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
     adjustTextareaHeight(textareaRef);
   };
 
+  const handleSendUser = () => {
+    handleSend("user")
+  }
+  
+  const messageTypeToClassName = (role: string) => {
+    const hm: { [key: string]: string } = {
+      user: "message user-message",
+      assistant: "message ai-message",
+      tool: "message tool-message",
+      tool_call: "message tool-message",
+    };
+    return hm[role] || 'ai-message';
+  }
+
+  const toolCallId2ToolName = (messages: Message[]) => {
+    const results: { [key: string]: string | undefined } = {};
+
+    for (const message of messages) {
+      if (message.tool_calls?.length) {
+        for (const tool_call of message.tool_calls) {
+          results[tool_call.id] = tool_call.function?.name;
+        }
+      }
+    }
+
+    return results;
+  }
+
+  const transformMessage2MessagesRender = (
+    message: Message,
+    id2ToolName: { [key: string]: string | undefined }
+  ) => {
+    const results: MessageRender[] = [];
+    if (message.tool_calls?.length) {
+      for (const tool_call of message.tool_calls) {
+        const msg: MessageRender = {
+          type: "tool_call",
+          content: JSON.stringify(tool_call),
+          tool_name: id2ToolName[tool_call.id] || "tool",
+        };
+        results.push(msg);
+      }
+    }
+
+    if (message.content.length) {
+      const msg: MessageRender = {
+        type: message.role,
+        content: message.content
+      };
+
+      if (message.role === "tool") {
+        msg.tool_name = id2ToolName[message.tool_call_id || ""] || "tool";
+      }
+      results.push(msg);
+    }
+    return results;
+  };
+
   return (
     <div className={`main-content ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
       <div className="model-selector-container">
@@ -243,14 +329,20 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
       <div className="chat-container">
         <div className="scrollable-content" ref={chatWindowRef}>
           <div className="chat-window">
-            {currentChat?.messages.map((message, index) => (
-              <div key={index} className={`message ${message.role === "user" ? 'user-message' : 'ai-message'}`}>
-                {renderMarkdownWithCode(message.content, starryNight)}
-                {isStreaming && index === currentChat.messages.length - 1 && message.role === 'assistant' && (
-                  <span className="pulsing-circle"></span>
-                )}
-              </div>
-            ))}
+            {
+              currentChat?.messages
+              .flatMap(message => transformMessage2MessagesRender(
+                message, toolCallId2ToolName(currentChat.messages))
+              )
+              .map((message, index) => (
+                <div key={index} className={`${messageTypeToClassName(message.type)}`}>
+                  {renderMessageInChat(message, starryNight)}
+                  {isStreaming && index === currentChat.messages.length - 1 && message.type === 'assistant' && (
+                    <span className="pulsing-circle"></span>
+                  )}
+                </div>
+              ))
+            }
           </div>
         </div>
         <div className="input-container">
@@ -266,7 +358,7 @@ export const ChatComponent: React.FC<ChatProps> = ({ sidebarOpen, ctx }) => {
                 style={{outline: 'none'}}
               />
             <button
-              onClick={isStreaming ? handleStop : handleSend}
+              onClick={isStreaming ? handleStop : handleSendUser}
               className="send-button"
             >{isStreaming ? 'Stop' : 'Send'}</button>
           </div>
