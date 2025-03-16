@@ -24,6 +24,9 @@ export interface ChatContextType {
 
   tools: any[];
   setTools: (newTools: any[]) => void;
+
+  files: FileItem[];
+  setFiles: (newFiles: FileItem[]) => void;
 }
 
 export interface Message {
@@ -113,3 +116,16 @@ export interface ModelListResponse {
 export interface ChatToolResponse{
   tools: any[];
 }
+
+export interface FileItem {
+  file_name: string;
+  file_name_orig: string;
+  file_ext: string;
+  file_role: string;
+  file_size: number;
+  user_id: number;
+  created_at: Date;
+  file_type?: string;
+  processing_status?: string;
+}
+

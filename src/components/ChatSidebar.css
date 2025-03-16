@@ -107,7 +107,7 @@
   margin-top: auto;
 }
 
-.settings-button {
+.sidebar-button {
   border: none;
   border-radius: 0;
   color: #fff;
@@ -121,7 +121,7 @@
   white-space: nowrap;
 }
 
-.closed .settings-button {
+.closed .sidebar-button {
   /*padding: 8px 0;*/
 }
 
@@ -130,6 +130,17 @@
   width: 3rem;
 }
 
-.closed .settings-button span {
+.closed .sidebar-button span {
   display: none;
+}
+
+.sidebar-knowledge {
+  width: 100%;
+  border-bottom: 1px solid #333;
+  transition: background-color 0.2s, width 0.2s ease;
+}
+
+.closed .sidebar-knowledge {
+  height: 3rem;
+  width: 3rem;
 }

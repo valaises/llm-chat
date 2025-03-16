@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './ChatSidebar.css';
 import SettingsModalWindow from './SettingsModalWindow.tsx';
 import {ChatContextType} from "../types.ts";
+import KnowledgeModalWindow from "./KnowledgeModalWindow.tsx";
 
 
 interface ChatSidebarProps {
@@ -11,15 +12,25 @@ interface ChatSidebarProps {
 }
 
 export const ChatSidebar: React.FC<ChatSidebarProps> = ({isOpen, onToggle, ctx,}) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [isKnowledgeModalOpen, setIsKnowledgeModalOpen] = useState(false);
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
+  const handleSettingsOpenModal = () => {
+    setIsSettingsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleSettingsCloseModal = () => {
+    setIsSettingsModalOpen(false);
   };
+
+  const handleKnowledgeOpenModal = () => {
+    setIsKnowledgeModalOpen(true);
+  }
+
+  const handleKnowledgeCloseModal = () => {
+    setIsKnowledgeModalOpen(false);
+  };
+
 
   return (
     <>
@@ -36,6 +47,17 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({isOpen, onToggle, ctx,}
               <span aria-hidden="true">
                 {isOpen ? '◀' : '▶'}
               </span>
+            </button>
+          </div>
+          
+          <div className="sidebar-knowledge">
+            <button
+              className="sidebar-button"
+              type="button"
+              aria-label="Knowledge"
+              onClick={handleKnowledgeOpenModal}
+            >
+              {isOpen ? ('📒 Knowledge') : ('📒')}
             </button>
           </div>
           
@@ -60,24 +82,19 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({isOpen, onToggle, ctx,}
 
           <div className="sidebar-footer">
             <button 
-              className="settings-button"
+              className="sidebar-button"
               type="button"
               aria-label="Settings"
-              onClick={handleOpenModal}
-            >
-              {isOpen ? (
-                '⚙️ Settings'
-              ) : (
-                '⚙️'
-              )}
-            </button>
+              onClick={handleSettingsOpenModal}
+            > {isOpen ? ('⚙️ Settings') : ('⚙️')} </button>
           </div>
         </div>
       </div>
 
-      <SettingsModalWindow isOpen={isModalOpen} onClose={handleCloseModal} ctx={ctx}>
-        <h2>Settings</h2>
-        {/* Modal content will be added later */}
+      <KnowledgeModalWindow isOpen={isKnowledgeModalOpen} onClose={handleKnowledgeCloseModal} ctx={ctx}>
+      </KnowledgeModalWindow>
+
+      <SettingsModalWindow isOpen={isSettingsModalOpen} onClose={handleSettingsCloseModal} ctx={ctx}>
       </SettingsModalWindow>
     </>
   );

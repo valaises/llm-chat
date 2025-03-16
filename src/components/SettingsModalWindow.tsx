@@ -44,7 +44,7 @@ const SettingsModalWindow: React.FC<SettingsModalWindowProps> = ({ isOpen, onClo
 
   return (
     <div className="settings-modal-overlay">
-      <div className="settings-modal-content" ref={modalRef}>
+      <div className="  settings-modal-content" ref={modalRef}>
         <div className="settings-modal-header">
           <h2 className="settings-modal-title">Settings</h2>
           <button className="settings-modal-close" onClick={onClose}>×</button>

@@ -19,7 +19,7 @@ const ToolMessage: React.FC<{ message: MessageRender }> = ({ message }) => {
     return (
       <div className="tool-message">
         <div onClick={toggleContentVisibility} className="tool-message-title">
-          <span className="tool-message-icon">🔭 TOOL</span>
+          <span className="tool-message-icon">🔭</span>
           <span>{message.tool_name}</span>
         </div>
         <div className={`tool-message-content ${isContentVisible ? 'visible' : 'hidden'}`}>
@@ -33,7 +33,7 @@ const ToolMessage: React.FC<{ message: MessageRender }> = ({ message }) => {
     return (
       <div className="tool-message">
         <div onClick={toggleContentVisibility} className="tool-message-title">
-          <span className="tool-message-icon">🔗 TOOL</span>
+          <span className="tool-message-icon">🔗</span>
           <span>{message.tool_name}</span>
         </div>
         <div className={`tool-message-content ${isContentVisible ? 'visible' : 'hidden'}`}>

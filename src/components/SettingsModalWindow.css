@@ -254,3 +254,74 @@ input:checked + .toggle-slider:before {
   outline: none;
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
+
+.file-upload-area {
+  width: 100%;
+  cursor: pointer;
+  margin-bottom: 16px;
+  outline: none;
+}
+
+.dashed-border {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 0.5rem;
+  text-align: center;
+  transition: border-color 0.3s ease;
+}
+
+.file-upload-area:hover .dashed-border,
+.file-upload-area:focus .dashed-border {
+  border-color: #888;
+}
+
+.upload-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #666;
+}
+
+.upload-content svg {
+  width: 24px;
+  height: 24px;
+}
+
+.file-types {
+  font-size: 12px;
+  color: #888;
+}
+
+.uploaded-files {
+  margin-top: 16px;
+}
+
+.uploaded-files h4 {
+  margin-bottom: 8px;
+}
+
+.uploaded-files ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.uploaded-files li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.remove-file {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #666;
+}
+
+.remove-file:hover {
+  color: #ff4d4f;
+}

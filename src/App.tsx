@@ -10,6 +10,7 @@ import { ModelsHandler } from './models'
 
 import './App.css'
 import {ToolsHandler} from "./tools.ts";
+import {FilesHandler} from "./files.ts";
 
 function App() {
   return (
@@ -35,10 +36,11 @@ function AppContent() {
     ctx.setCurrentChatID(newChat.id);
   };
 
-  const fetchModelsAndTools = async () => {
+  const fetchModelsAndToolsAndFiles = async () => {
     if (ctx.endpointURL && ctx.endpointAPIKey) {
       const modelsHandler = new ModelsHandler(ctx.endpointURL, ctx.endpointAPIKey);
       const toolsHandler = new ToolsHandler(ctx.endpointURL, ctx.endpointAPIKey);
+      const filesHandler = new FilesHandler(ctx.endpointURL, ctx.endpointAPIKey);
 
       try {
         const models = await modelsHandler.listModels();
@@ -53,13 +55,21 @@ function AppContent() {
       } catch (error) {
         console.error('Failed to fetch tools: ', error);
       }
+
+      try {
+        const files = await filesHandler.listFiles();
+        ctx.setFiles(files.files);
+      } catch (error) {
+        console.error('Failed to fetch files: ', error);
+      }
+
     }
   };
 
   useEffect(() => {
-    fetchModelsAndTools();
+    fetchModelsAndToolsAndFiles();
 
-    const intervalId = setInterval(fetchModelsAndTools, 30000);
+    const intervalId = setInterval(fetchModelsAndToolsAndFiles, 30000);
 
     // Clean up the interval when the component unmounts
     return () => clearInterval(intervalId);
