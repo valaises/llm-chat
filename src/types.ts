@@ -27,6 +27,9 @@ export interface ChatContextType {
 
   files: FileItem[];
   setFiles: (newFiles: FileItem[]) => void;
+
+  ongoings: OngoingStatus[];
+  setOngoings: (newOngoings: OngoingStatus[]) => void;
 }
 
 export interface Message {
@@ -108,11 +111,6 @@ export interface CompletionModel {
   owned_by: string;
 }
 
-export interface ModelListResponse {
-  object: string;
-  data: CompletionModel[];
-}
-
 export interface ChatToolResponse{
   tools: any[];
 }
@@ -129,3 +127,12 @@ export interface FileItem {
   processing_status?: string;
 }
 
+export interface OngoingStatus {
+  id: string;
+  name: string;
+  status: string;
+  show_scope: string;
+  error_text?: string;
+  percent?: number;
+  created_at?: Date;
+}

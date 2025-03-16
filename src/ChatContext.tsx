@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {generateRandomHash} from "./utils.ts";
-import {Chat, CompletionModel, FileItem} from "./types.ts";
+import {Chat, CompletionModel, FileItem, OngoingStatus} from "./types.ts";
 import {ChatContext} from './UseChat.ts';
 
 
@@ -82,6 +82,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [models, _setModels] = useState<CompletionModel[]>([]);
   const [tools, _setTools] = useState<any[]>([]);
   const [files, _setFiles] = useState<FileItem[]>([]);
+  const [ongoings, _setOngoings] = useState<OngoingStatus[]>([]);
 
   useEffect(() => {
     setChats(chats);
@@ -144,6 +145,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     _setFiles(newFiles);
   }
 
+  const updateOngoings = (newOngoings: OngoingStatus[]) => {
+    _setOngoings(newOngoings);
+  }
+
   useEffect(() => {
     if (!chats.some(chat => chat.id === currentChatID) && chats.length > 0) {
       updateCurrentChatId(chats[chats.length - 1].id);
@@ -179,6 +184,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       files: files,
       setFiles: updateFiles,
+
+      ongoings: ongoings,
+      setOngoings: updateOngoings,
     }}>
       {children}
     </ChatContext.Provider>

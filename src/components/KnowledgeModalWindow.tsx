@@ -19,18 +19,11 @@ const KnowledgeModalWindow: React.FC<Props> = ({ isOpen, onClose, ctx }) => {
 
   const uploadFile = (file: File) => {
     streamUploadFile(
+      ctx,
       file,
       ctx.endpointURL || "",
       ctx.endpointAPIKey || "",
       "document",
-      // Progress callback
-      (progress) => {},
-      // Complete callback
-      () => {
-        updateFilesList(ctx)
-      },
-      // Error callback
-      (error) => {}
     );
   };
 
@@ -179,7 +172,8 @@ const KnowledgeModalWindow: React.FC<Props> = ({ isOpen, onClose, ctx }) => {
                           <path d="M4 17L4 18C4 19.1046 4.89543 20 6 20L18 20C19.1046 20 20 19.1046 20 18L20 17"
                                 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
-                        <p>Drop Files here, click to upload, or paste from clipboard</p>
+                        <p className="file-drop-description">Drop Files here, click to upload, or paste from
+                          clipboard</p>
                         <p className="file-types">Supported file types: .pdf</p>
                       </div>
                     </div>
@@ -190,8 +184,12 @@ const KnowledgeModalWindow: React.FC<Props> = ({ isOpen, onClose, ctx }) => {
                   <div className="uploaded-files">
                     <h4>Uploaded Files</h4>
                     <ul>
-                      {ctx.files.map((file) => (
-                        <li key={file.file_name} className={`file-item`}>
+                      {ctx.files.map((file, index) => (
+                        <li
+                          key={file.file_name}
+                          className={`file-item ${index % 2 === 1 ? 'alternate-row' : ''}`}
+                          style={(index + 1) % 2 === 1 ? {backgroundColor: '#303030'} : {}}
+                        >
                           <div className="file-info">
                             <span className="file-name">{file.file_name_orig}</span>
                           </div>
@@ -209,6 +207,15 @@ const KnowledgeModalWindow: React.FC<Props> = ({ isOpen, onClose, ctx }) => {
               </div>
             )}
           </div>
+        </div>
+        <div className="knowledge-documents-ongoings">
+          <ul>
+            {ctx.ongoings.filter(i => i.show_scope === "knowledge_documents").map((el) => (
+              <li key={el.id} className="knowledge-documents-ongoing">
+                {el.name} {el.status} {el.percent || 0}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>

@@ -258,7 +258,6 @@ input:checked + .toggle-slider:before {
 .file-upload-area {
   width: 100%;
   cursor: pointer;
-  margin-bottom: 16px;
   outline: none;
 }
 
@@ -289,15 +288,17 @@ input:checked + .toggle-slider:before {
 
 .file-types {
   font-size: 12px;
+  padding: 0;
+  margin: 0;
   color: #888;
 }
 
-.uploaded-files {
-  margin-top: 16px;
+.file-drop-description {
+  margin: 0 0 8px;
 }
 
 .uploaded-files h4 {
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .uploaded-files ul {
@@ -312,6 +313,8 @@ input:checked + .toggle-slider:before {
   align-items: center;
   border-radius: 4px;
   margin-bottom: 4px;
+  padding-left: 6px;
+  height: 1.7rem;
 }
 
 .remove-file {
@@ -324,4 +327,21 @@ input:checked + .toggle-slider:before {
 
 .remove-file:hover {
   color: #ff4d4f;
+}
+
+.knowledge-documents-ongoings {
+  position: sticky;
+  align-self: flex-end; /* Align to the bottom of the flex container */
+  margin-left: auto; /* Push to the right */
+  margin-right: 2rem; /* Space from the right edge */
+  background-color: inherit;
+  z-index: 1;
+  padding-bottom: 0.5rem;
+  list-style-type: none; /* Removes bullets from the ul */
+  padding-left: 0; /* Removes default padding */
+}
+
+.knowledge-documents-ongoing {
+  border-radius: 4px;
+  list-style-type: none; /* Removes the bullet point */
 }
