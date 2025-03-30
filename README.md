@@ -70,6 +70,52 @@ To preview the production build locally:
 npm run preview
 ```
 
+## Docker Support
+
+This project includes Docker and Docker Compose configurations for both development and production environments.
+
+### Using Docker for Development
+
+To start the development environment with hot-reloading:
+
+```bash
+docker-compose up app-dev
+```
+
+This will start the Vite development server on port 5173 with hot module replacement enabled.
+
+### Using Docker for Production
+
+To build and run the production version:
+
+```bash
+docker-compose up app-prod
+```
+
+This will build the application and serve it using Nginx on port 80.
+
+### Building Docker Images Manually
+
+To build the Docker image manually:
+
+```bash
+# For production
+docker build -t llm-chatui:latest .
+
+# For development
+docker build -t llm-chatui:dev -f Dockerfile.dev .
+```
+
+### Running Docker Containers Manually
+
+```bash
+# Run production container
+docker run -p 80:80 llm-chatui:latest
+
+# Run development container
+docker run -p 5173:5173 -v $(pwd):/app -v /app/node_modules llm-chatui:dev
+```
+
 ## Project Structure
 
 The project is organized into several key directories:

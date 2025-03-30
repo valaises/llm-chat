@@ -1,0 +1,25 @@
+services:
+  # Development service with hot-reloading
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: vite-react-dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npm run dev -- --host
+
+  # Production service
+  app-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vite-react-prod
+    ports:
+      - "80:80"
+    restart: unless-stopped
