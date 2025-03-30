@@ -82,7 +82,7 @@ To start the development environment with host network mode:
 docker-compose up app-dev
 ```
 
-This will start the Vite development server using the host's network, making it available on port 5173 with hot module replacement enabled.
+This will start the Vite development server using the host's network, making it available on port 5173 with hot module replacement enabled. The server is configured to accept connections from any hostname (allowedHosts is set to 'all').
 
 If you prefer using port mapping instead of host network:
 

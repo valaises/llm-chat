@@ -13,7 +13,7 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
-    command: npm run dev -- --host
+    command: npm run dev -- --host --strictPort
 
   # Production service
   app-prod:
