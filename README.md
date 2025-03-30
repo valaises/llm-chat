@@ -76,23 +76,35 @@ This project includes Docker and Docker Compose configurations for both developm
 
 ### Using Docker for Development
 
-To start the development environment with hot-reloading:
+To start the development environment with host network mode:
 
 ```bash
 docker-compose up app-dev
 ```
 
-This will start the Vite development server on port 5173 with hot module replacement enabled.
+This will start the Vite development server using the host's network, making it available on port 5173 with hot module replacement enabled.
+
+If you prefer using port mapping instead of host network:
+
+```bash
+docker-compose --profile ports up app-dev-ports
+```
 
 ### Using Docker for Production
 
-To build and run the production version:
+To build and run the production version with host network mode:
 
 ```bash
 docker-compose up app-prod
 ```
 
-This will build the application and serve it using Nginx on port 80.
+This will build the application and serve it using Nginx, making it available directly on the host's port 80.
+
+If you prefer using port mapping instead of host network:
+
+```bash
+docker-compose --profile ports up app-prod-ports
+```
 
 ### Building Docker Images Manually
 

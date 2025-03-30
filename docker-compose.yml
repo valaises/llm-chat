@@ -1,12 +1,13 @@
+version: '3.8'
+
 services:
-  # Development service with hot-reloading
+  # Development service
   app-dev:
     build:
       context: .
       dockerfile: Dockerfile.dev
     container_name: vite-react-dev
-    ports:
-      - "5173:5173"
+    network_mode: host  # Using host network instead of port mapping
     volumes:
       - ./:/app
       - /app/node_modules
@@ -20,6 +21,5 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: vite-react-prod
-    ports:
-      - "80:80"
+    network_mode: host  # Using host network instead of port mapping
     restart: unless-stopped
