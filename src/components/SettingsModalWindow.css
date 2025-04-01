@@ -345,3 +345,95 @@ input:checked + .toggle-slider:before {
   border-radius: 4px;
   list-style-type: none; /* Removes the bullet point */
 }
+
+/* MCPL Servers Styles */
+.mcpl-servers-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.add-server-input-group {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.add-server-btn-inline {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+  min-width: 120px;
+}
+
+.add-server-btn-inline:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.mcpl-servers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.servers-list-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 12px 0;
+  color: #fff;
+}
+
+.mcpl-server-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 10px 16px;
+  border-radius: 6px;
+}
+
+.mcpl-server-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex: 1;
+}
+
+.mcpl-server-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.remove-server-btn {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  font-size: 18px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.remove-server-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ff4d4f;
+}
+
+.no-servers-message {
+  color: #666;
+  font-style: italic;
+  margin-top: 8px;
+}

@@ -11,6 +11,7 @@ import { ModelsHandler } from './models'
 import './App.css'
 import {ToolsHandler} from "./tools.ts";
 import {FilesHandler} from "./files.ts";
+import {MCPLHandler} from "./mcpl.ts";
 
 function App() {
   return (
@@ -36,11 +37,12 @@ function AppContent() {
     ctx.setCurrentChatID(newChat.id);
   };
 
-  const fetchModelsAndToolsAndFiles = async () => {
+  const fetchServerCaps = async () => {
     if (ctx.endpointURL && ctx.endpointAPIKey) {
       const modelsHandler = new ModelsHandler(ctx.endpointURL, ctx.endpointAPIKey);
       const toolsHandler = new ToolsHandler(ctx.endpointURL, ctx.endpointAPIKey);
       const filesHandler = new FilesHandler(ctx.endpointURL, ctx.endpointAPIKey);
+      const mcplHandler = new MCPLHandler(ctx.endpointURL, ctx.endpointAPIKey);
 
       try {
         const models = await modelsHandler.listModels();
@@ -63,13 +65,20 @@ function AppContent() {
         console.error('Failed to fetch files: ', error);
       }
 
+      try {
+        const servers = await mcplHandler.listServers();
+        ctx.setMcplServers(servers);
+      } catch (error) {
+        console.error('Failed to fetch MCPL servers: ', error);
+      }
+
     }
   };
 
   useEffect(() => {
-    fetchModelsAndToolsAndFiles();
+    fetchServerCaps();
 
-    const intervalId = setInterval(fetchModelsAndToolsAndFiles, 30000);
+    const intervalId = setInterval(fetchServerCaps, 30000);
 
     // Clean up the interval when the component unmounts
     return () => clearInterval(intervalId);

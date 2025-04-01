@@ -30,11 +30,14 @@ export interface ChatContextType {
 
   ongoings: OngoingStatus[];
   setOngoings: (newOngoings: OngoingStatus[]) => void;
+
+  mcplServers: MCPLServerCfg[];
+  setMcplServers: (newServers: MCPLServerCfg[]) => void;
 }
 
 export interface Message {
   role: string;
-  content: string;
+  content: string; // todo: content may not be not only string
   tool_calls?: any[]
   tool_call_id?: string;
 }
@@ -135,4 +138,9 @@ export interface OngoingStatus {
   error_text?: string;
   percent?: number;
   created_at?: Date;
+}
+
+export interface MCPLServerCfg {
+  address: string;
+  isActive: boolean;
 }

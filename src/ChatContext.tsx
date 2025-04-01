@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {generateRandomHash} from "./utils.ts";
-import {Chat, CompletionModel, FileItem, OngoingStatus} from "./types.ts";
+import {Chat, CompletionModel, FileItem, MCPLServerCfg, OngoingStatus} from "./types.ts";
 import {ChatContext} from './UseChat.ts';
 
 
@@ -83,6 +83,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [tools, _setTools] = useState<any[]>([]);
   const [files, _setFiles] = useState<FileItem[]>([]);
   const [ongoings, _setOngoings] = useState<OngoingStatus[]>([]);
+  const [mcplServers, _setMcplServers] = useState<MCPLServerCfg[]>([]);
 
   useEffect(() => {
     setChats(chats);
@@ -149,6 +150,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     _setOngoings(newOngoings);
   }
 
+  const updateMCPLServers = (newServers: MCPLServerCfg[]) => {
+    _setMcplServers(newServers);
+  }
+
   useEffect(() => {
     if (!chats.some(chat => chat.id === currentChatID) && chats.length > 0) {
       updateCurrentChatId(chats[chats.length - 1].id);
@@ -187,6 +192,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       ongoings: ongoings,
       setOngoings: updateOngoings,
+
+      mcplServers: mcplServers,
+      setMcplServers: updateMCPLServers,
     }}>
       {children}
     </ChatContext.Provider>
