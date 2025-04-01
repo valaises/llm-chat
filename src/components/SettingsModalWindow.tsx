@@ -49,11 +49,9 @@ const SettingsModalWindow: React.FC<SettingsModalWindowProps> = ({ isOpen, onClo
       // Create a new server config
       const newServer: MCPLServerCfg = {
         address: newServerUrl,
-        isActive: true
+        is_active: true
       };
 
-      // Add to existing servers
-      console.log(ctx.mcplServers)
       const updatedServers = [...ctx.mcplServers, newServer];
 
       // Update servers via API
@@ -87,15 +85,13 @@ const SettingsModalWindow: React.FC<SettingsModalWindowProps> = ({ isOpen, onClo
       const updatedServers = [...ctx.mcplServers];
       updatedServers[index] = {
         ...updatedServers[index],
-        isActive: !updatedServers[index].isActive
+        is_active: !updatedServers[index].is_active
       };
 
       // Update servers via API
       const mcplHandler = new MCPLHandler(ctx.endpointURL, ctx.endpointAPIKey);
-      await mcplHandler.updateServers(updatedServers);
+      const servers = await mcplHandler.updateServers(updatedServers);
 
-      // Refresh the server list
-      const servers = await mcplHandler.listServers();
       ctx.setMcplServers(servers);
     } catch (error) {
       console.error('Failed to toggle MCPL server:', error);
@@ -232,7 +228,7 @@ const SettingsModalWindow: React.FC<SettingsModalWindowProps> = ({ isOpen, onClo
                               <input
                                 type="checkbox"
                                 id={`server-toggle-${index}`}
-                                checked={server.isActive}
+                                checked={server.is_active}
                                 onChange={() => handleToggleServer(index)}
                                 disabled={isLoading}
                               />

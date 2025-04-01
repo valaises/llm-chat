@@ -27,6 +27,7 @@ export class MCPLHandler {
   }
 
   async updateServers(servers: MCPLServerCfg[]): Promise<MCPLServerCfg[]> {
+    console.info("uploading servers: ", servers);
     const response = await fetch(`${this.apiUrl}/mcpl-servers-update`, {
       method: 'POST',
       headers: {

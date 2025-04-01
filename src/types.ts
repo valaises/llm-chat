@@ -142,5 +142,5 @@ export interface OngoingStatus {
 
 export interface MCPLServerCfg {
   address: string;
-  isActive: boolean;
+  is_active: boolean;
 }
