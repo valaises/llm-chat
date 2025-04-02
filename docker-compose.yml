@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    container_name: vite-react-dev
+    container_name: llm-chat-dev
     network_mode: host  # Using host network instead of port mapping
     volumes:
       - ./:/app
@@ -19,6 +19,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: vite-react-prod
+    container_name: llm-chat-prod
     network_mode: host  # Using host network instead of port mapping
     restart: unless-stopped
