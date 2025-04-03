@@ -5,7 +5,6 @@ export async function *completionResponseChunkCollector(chunks: AsyncGenerator<C
   let currentToolCall: any = null;
 
   for await (const chunk of chunks) {
-    console.log(chunk)
     if (chunk.object === "tool_res_messages") {
       yield {
         type: "tool_res_messages",
@@ -119,7 +118,8 @@ export class CompletionsHandler {
     return await response.json() as CompletionResponse;
   }
 
-  private async *streamingCompletion(
+
+  private async* streamingCompletion(
     requestData: CompletionRequest,
     signal?: AbortSignal
   ): AsyncGenerator<CompletionResponseChunk, void, unknown> {
@@ -130,7 +130,7 @@ export class CompletionsHandler {
         'Authorization': `Bearer ${this.apiKey}`,
         'Accept': 'text/event-stream'
       },
-      body: JSON.stringify({ ...requestData, stream: true }),
+      body: JSON.stringify({...requestData, stream: true}),
       signal
     });
 
@@ -144,24 +144,58 @@ export class CompletionsHandler {
 
     const reader = response.body.getReader();
     const decoder = new TextDecoder('utf-8');
+    let buffer = '';
 
     try {
       while (true) {
-        const { done, value } = await reader.read();
+        const {done, value} = await reader.read();
         if (done) break;
 
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n').filter(line => line.trim() !== '');
+        // Append new chunk to existing buffer
+        buffer += decoder.decode(value, {stream: true});
 
-        for (const line of lines) {
+        // Process complete lines from the buffer
+        let lineEnd = buffer.indexOf('\n');
+        while (lineEnd !== -1) {
+          const line = buffer.substring(0, lineEnd).trim();
+          buffer = buffer.substring(lineEnd + 1);
+
           if (line.startsWith('data: ')) {
             const jsonData = line.slice(6);
             if (jsonData === '[DONE]') {
               return;
             }
-            yield JSON.parse(jsonData) as CompletionResponseChunk;
+
+            try {
+              yield JSON.parse(jsonData) as CompletionResponseChunk;
+            } catch (e) {
+              console.error('Error parsing JSON:', e, 'Data:', jsonData);
+            }
+          }
+
+          lineEnd = buffer.indexOf('\n');
+        }
+      }
+
+      // Process any remaining data in the buffer
+      if (buffer.trim() !== '') {
+        const remaining = buffer.trim();
+        if (remaining.startsWith('data: ')) {
+          const jsonData = remaining.slice(6);
+          if (jsonData !== '[DONE]') {
+            try {
+              yield JSON.parse(jsonData) as CompletionResponseChunk;
+            } catch (e) {
+              console.error('Error parsing JSON:', e, 'Data:', jsonData);
+            }
           }
         }
+      }
+
+      // Final decoder flush
+      const remaining = decoder.decode();
+      if (remaining.trim() !== '') {
+        console.log('Remaining data after stream end:', remaining);
       }
     } finally {
       reader.cancel();

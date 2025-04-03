@@ -35,16 +35,43 @@ export interface ChatContextType {
   setMcplServers: (newServers: MCPLServerCfg[]) => void;
 }
 
+export interface MessageContentItemDocSearch {
+  text: string;
+  content: string;
+  highlight_box?: number[];
+  page_n?: number;
+}
+
+export interface MessageContentItemText {
+  text: string;
+  content: string;
+}
+
+export interface MessageContentItemImage {
+  image_url: string;
+  type: string
+}
+
+export interface MessageContentItemAudio {
+  input_audio: string;
+  type: string;
+}
+
+export interface MessageContentItemFile {
+  file: string;
+  type: string;
+}
+
 export interface Message {
   role: string;
-  content: string; // todo: content may not be not only string
+  content: string | (MessageContentItemText | MessageContentItemImage | MessageContentItemAudio | MessageContentItemFile | MessageContentItemDocSearch)[];
   tool_calls?: any[]
   tool_call_id?: string;
 }
 
 export interface MessageRender {
   type: string,
-  content: string,
+  content: string | (MessageContentItemText | MessageContentItemImage | MessageContentItemAudio | MessageContentItemFile | MessageContentItemDocSearch)[],
   tool_name?: string,
 }
 

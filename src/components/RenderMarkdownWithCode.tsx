@@ -23,7 +23,12 @@ const ToolMessage: React.FC<{ message: MessageRender }> = ({ message }) => {
           <span>{message.tool_name}</span>
         </div>
         <div className={`tool-message-content ${isContentVisible ? 'visible' : 'hidden'}`}>
-          <pre>{message.content}</pre>
+          <CodeBlock language="json" text={JSON.stringify(message.content, null, 2)}>
+            <div className="code-header">json</div>
+            <pre className="highlight highlight-json">
+              <code>{JSON.stringify(message.content, null, 2)}</code>
+            </pre>
+          </CodeBlock>
         </div>
       </div>
     );
@@ -37,17 +42,21 @@ const ToolMessage: React.FC<{ message: MessageRender }> = ({ message }) => {
           <span>{message.tool_name}</span>
         </div>
         <div className={`tool-message-content ${isContentVisible ? 'visible' : 'hidden'}`}>
-          <pre>{message.content}</pre>
+          <CodeBlock language="json" text={JSON.stringify(message.content, null, 2)}>
+            <div className="code-header">json</div>
+            <pre className="highlight highlight-json">
+              <code>{JSON.stringify(message.content, null, 2)}</code>
+            </pre>
+          </CodeBlock>
         </div>
       </div>
     );
   }
-
 };
 
 
 export const renderMessageInChat = (message: MessageRender, starryNight) => {
-  if (!starryNight) return message.content;
+  if (!starryNight) return JSON.stringify(message.content);
 
   if (message.type === "tool_call" || message.type === "tool") {
     return <ToolMessage message={message} />;

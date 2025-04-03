@@ -10,8 +10,9 @@
 }
 
 .tool-message-content.visible {
-  max-height: 100px; /* Adjust as needed */
+  max-height: 300px; /* Adjust as needed */
   opacity: 1;
+  overflow-y: auto;
 }
 
 .tool-message-content.hidden {
