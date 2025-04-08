@@ -13,6 +13,6 @@ export default defineConfig({
       host: 'localhost'
     },
     // Allow all hosts to access the dev server
-    allowedHosts: ['chat.home.valerii.cc', 'all']
+    allowedHosts: ['chat.home.valerii.cc', 'all', 'coxit.valerii.cc']
   }
 })

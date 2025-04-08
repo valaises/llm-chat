@@ -1,7 +1,6 @@
 import {ChatContextType} from "./types.ts";
 import {updateFilesList} from "./files.ts";
 
-
 export const streamUploadFile = (
   ctx: ChatContextType,
   file: File,
@@ -10,121 +9,109 @@ export const streamUploadFile = (
   fileRole: string,
 ) => {
   const uploadUrl = `${apiUrl}/files/upload`;
-  const chunkSize = 1024 * 1024;
   let aborted = false;
-
-  const headers = {
-    'Content-Type': 'application/octet-stream',
-    'X-File-Name': encodeURIComponent(file.name),
-    'X-File-Role': fileRole,
-    'Authorization': `Bearer ${apiKey}`
-  };
-
-  const controller = new AbortController();
-  const { signal } = controller;
 
   const randomId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
-  const uploadWithChunks = async () => {
-    try {
-      // Create a ReadableStream that reads the file in chunks
-      const fileStream = new ReadableStream({
-        async start(controller) {
-          let offset = 0;
-          let bytesSent = 0;
+  // Create a new ongoing upload entry
+  const newOngoing = {
+    id: randomId,
+    name: file.name,
+    status: "in_progress",
+    show_scope: "knowledge_documents",
+    percent: 0
+  };
+  ctx.setOngoings([...ctx.ongoings, newOngoing]);
 
-          while (offset < file.size && !aborted) {
-            // Calculate the end position for this chunk
-            const end = Math.min(offset + chunkSize, file.size);
+  // Create an XMLHttpRequest for better upload control
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', uploadUrl, true);
 
-            // Slice the file to get the chunk
-            const chunk = file.slice(offset, end);
+  // Set headers
+  xhr.setRequestHeader('X-File-Name', encodeURIComponent(file.name));
+  xhr.setRequestHeader('X-File-Role', fileRole);
+  xhr.setRequestHeader('Authorization', `Bearer ${apiKey}`);
+  xhr.setRequestHeader('Content-Type', 'application/octet-stream');
 
-            // Convert the chunk to ArrayBuffer
-            const arrayBuffer = await chunk.arrayBuffer();
+  // Track upload progress
+  xhr.upload.onprogress = (event) => {
+    if (event.lengthComputable) {
+      const percent = Math.round((event.loaded / event.total) * 100);
 
-            // Enqueue the chunk to the stream
-            controller.enqueue(new Uint8Array(arrayBuffer));
+      const currentOngoings = ctx.ongoings;
+      const ongoingIndex = currentOngoings.findIndex(o => o.id === randomId);
 
-            // Update offset and bytes sent
-            offset = end;
-            bytesSent += arrayBuffer.byteLength;
-
-            // Calculate and report progress
-            const percent = (bytesSent / file.size) * 100;
-
-            const currentOngoings = ctx.ongoings;
-            const ongoingIndex = currentOngoings.findIndex(o => o.id === randomId);
-
-            if (ongoingIndex !== -1) {
-              const updatedOngoing = {
-                ...currentOngoings[ongoingIndex],
-                status: "in_progress",
-                percent: Math.round(percent)
-              };
-              const updatedOngoings = [...currentOngoings];
-              updatedOngoings[ongoingIndex] = updatedOngoing;
-              ctx.setOngoings(updatedOngoings);
-            } else {
-              const newOngoing = {
-                id: randomId,
-                name: file.name,
-                status: "in_progress",
-                show_scope: "knowledge_documents",
-                percent: Math.round(percent)
-              };
-              ctx.setOngoings([...currentOngoings, newOngoing]);
-            }
-
-            // Small delay to allow UI updates
-            await new Promise(resolve => setTimeout(resolve, 0));
-          }
-
-          // Close the stream when done
-          controller.close();
-        },
-        cancel() {
-          aborted = true;
-        }
-      });
-
-      // Use fetch with the stream as the body
-      const response = await fetch(uploadUrl, {
-        method: 'POST',
-        headers,
-        body: fileStream,
-        signal,
-        duplex: 'half' // Add this line to specify the duplex option
-      });
-
-      if (!response.ok) {
-        const ongoing = ctx.ongoings.find(o => o.id === randomId);
-        if (ongoing) {
-          ongoing.status = "failed";
-          ongoing.error_text = response.statusText;
-        }
-
-        throw new Error(`Upload failed: ${response.statusText}`);
-
+      if (ongoingIndex !== -1) {
+        const updatedOngoing = {
+          ...currentOngoings[ongoingIndex],
+          status: "in_progress",
+          percent
+        };
+        const updatedOngoings = [...currentOngoings];
+        updatedOngoings[ongoingIndex] = updatedOngoing;
+        ctx.setOngoings(updatedOngoings);
       }
-      const result = await response.json();
-
-      // ongoing complete -> remove
-      const updatedOngoings = ctx.ongoings.filter(o => o.id !== randomId);
-      ctx.setOngoings(updatedOngoings);
-
-      updateFilesList(ctx);
-      return result;
-    } catch (error) {
-      console.log(error);
     }
   };
 
-  // Start the upload and return the abort function
-  uploadWithChunks();
+  // Handle response
+  xhr.onload = () => {
+    if (xhr.status >= 200 && xhr.status < 300) {
+      // Success
+      try {
+        const result = JSON.parse(xhr.responseText);
 
+        // Remove ongoing entry
+        const updatedOngoings = ctx.ongoings.filter(o => o.id !== randomId);
+        ctx.setOngoings(updatedOngoings);
+
+        updateFilesList(ctx);
+      } catch (error) {
+        console.error("Error parsing response:", error);
+        handleUploadError("Failed to parse server response");
+      }
+    } else {
+      // Error
+      handleUploadError(`Upload failed: ${xhr.statusText}`);
+    }
+  };
+
+  // Handle network errors
+  xhr.onerror = () => {
+    handleUploadError("Network error occurred");
+  };
+
+  // Handle abort
+  xhr.onabort = () => {
+    const updatedOngoings = ctx.ongoings.filter(o => o.id !== randomId);
+    ctx.setOngoings(updatedOngoings);
+  };
+
+  // Helper function to handle upload errors
+  const handleUploadError = (errorMessage) => {
+    const currentOngoings = ctx.ongoings;
+    const ongoingIndex = currentOngoings.findIndex(o => o.id === randomId);
+
+    if (ongoingIndex !== -1) {
+      const updatedOngoing = {
+        ...currentOngoings[ongoingIndex],
+        status: "failed",
+        error_text: errorMessage
+      };
+      const updatedOngoings = [...currentOngoings];
+      updatedOngoings[ongoingIndex] = updatedOngoing;
+      ctx.setOngoings(updatedOngoings);
+    }
+
+    console.error(errorMessage);
+  };
+
+  // Send the file
+  xhr.send(file);
+
+  // Return abort function
   return () => {
     aborted = true;
-    controller.abort();
+    xhr.abort();
   };
 };
