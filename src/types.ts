@@ -36,10 +36,12 @@ export interface ChatContextType {
 }
 
 export interface MessageContentItemDocSearch {
+  paragraph_id: string;
   text: string;
   content: string;
   highlight_box?: number[];
   page_n?: number;
+  section_name?: string;
 }
 
 export interface MessageContentItemText {
