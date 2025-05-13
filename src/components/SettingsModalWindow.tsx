@@ -199,7 +199,7 @@ const SettingsModalWindow: React.FC<SettingsModalWindowProps> = ({ isOpen, onClo
                         className="input-field"
                         value={newServerUrl}
                         onChange={(e) => setNewServerUrl(e.target.value)}
-                        placeholder="Enter server URL"
+                        placeholder="https://llmtools.valerii.cc/v1"
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && newServerUrl.trim()) {
                             handleAddServer();
