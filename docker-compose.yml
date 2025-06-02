@@ -22,3 +22,10 @@ services:
     container_name: llm-chat-prod
     network_mode: host  # Using host network instead of port mapping
     restart: unless-stopped
+
+  from-dockerhub:
+    image: oasis4691/llm-chat:latest
+    container_name: llm-chat-dhub
+    network_mode: host
+    restart: unless-stopped
+
